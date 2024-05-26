@@ -97,7 +97,10 @@ git_publish() {
     fi
 
     echo ":) Linting passed.  Publishing."
-    git push origin $(git-branch-name)
+    echo "   --    ____"
+    echo "  ---  /|_||_\`.__"
+    echo "   -- (   _    _ _\\"
+    git-publish-nolint
 }
 
 alias git-publish='git_publish'
