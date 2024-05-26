@@ -1,0 +1,103 @@
+#!/bin/bash
+
+export CLICOLOR=1
+export LSCOLORS=gabadaeafaabacadaeafag
+
+echo "ᕦ (ò_ó *) ᕤ"
+
+# Set PATH, MANPATH, etc., for Homebrew.
+eval "$(/opt/homebrew/bin/brew shellenv)"
+export PATH="/opt/homebrew/opt/ruby/bin:$PATH"
+
+export PS1="\[\e[33m\][\$(kubectl config current-context)] \[\e[0m\]\[\e[91m\]\d\[\e[0m\] \[\e[32m\]\W\[\e[0m\] \[\e[96m\]> \[\e[0m\]"
+
+alias cd-developer="cd /Users/drizzutojr/Developer"
+
+alias git-branch-name='git rev-parse --abbrev-ref HEAD'
+alias git-publish-nolint='git push origin $(git-branch-name)'
+
+lint() {
+    has_error=0
+
+    if ! command -v terraform &> /dev/null; then
+        echo "- Terraform not found.  Skipping terraform linting."
+    else
+        echo "+ Checking Terraform"
+        terraform fmt -check -recursive
+        if [ $? -ne 0 ]; then
+            has_error=1
+        fi
+    fi
+
+    if ! command -v tofu &> /dev/null; then
+        echo "- Opentofu not found.  Skipping Opentofu linting."
+    else
+        echo "+ Checking Opentofu"
+        tofu fmt -check -recursive
+        if [ $? -ne 0 ]; then
+            has_error=1
+        fi
+    fi
+
+    if [[ -n $VIRTUAL_ENV ]]; then
+        echo "+ Virtual Env Found.  Checking Python via Black"
+        black --check .
+        if [ $? -ne 0 ]; then
+            has_error=1
+        fi
+    elif command -v black &> /dev/null; then
+        echo "+ Checking Python via Black"
+        black --check .
+        if [ $? -ne 0 ]; then
+            has_error=1
+        fi
+    else
+        echo "- No Virtual Env or Black Found.  Skipping Python linting."
+    fi
+
+    if ! command -v golangci-lint &> /dev/null; then
+        echo "- Golangci-lint not found.  Skipping golang linting."
+    else
+        echo "+ Checking Golang"
+        for file in ./*; do
+            if [ -d "$file" ]; then
+                for subfile in "$file"/*; do
+                    if [ -f "$subfile" ] && [[ "$(basename "$subfile")" == "main.go" ]]; then
+                        echo "+ - Running golangci-lint in directory: $file"
+                        pushd "$file" > /dev/null
+                        golangci-lint run -E bodyclose --timeout 5m0s
+                        if [ $? -ne 0 ]; then
+                            has_error=1
+                        fi
+                        popd > /dev/null
+                        break
+                    fi
+                done
+            fi
+        done
+    fi
+
+    if ! command -v shellcheck &> /dev/null; then
+        echo "- Shellcheck not found.  Skipping shell linting."
+    else
+        echo "+ Checking Shell"
+        find "${1:-.}" -not -path '*/.git/*' -type f -exec grep -Eq '^#!(.*/|.*env +)(sh|bash|ksh)' {} \; -exec shellcheck {} +
+        if [ $? -ne 0 ]; then
+            has_error=1
+        fi
+    fi
+
+    return $has_error
+}
+
+git_publish() {
+    if ! lint; then
+        echo ":( Linting failed.  Not publishing."
+        return 1
+    fi
+
+    echo ":) Linting passed.  Publishing."
+    git push origin $(git-branch-name)
+}
+
+alias git-publish='git_publish'
