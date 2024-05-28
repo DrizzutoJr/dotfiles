@@ -9,9 +9,18 @@ echo "ᕦ (ò_ó *) ᕤ"
 eval "$(/opt/homebrew/bin/brew shellenv)"
 export PATH="/opt/homebrew/opt/ruby/bin:$PATH"
 
-export PS1="\[\e[33m\][\$(kubectl config current-context)] \[\e[0m\]\[\e[91m\]\d\[\e[0m\] \[\e[32m\]\W\[\e[0m\] \[\e[96m\]> \[\e[0m\]"
+alias k8s-mode='k8s_mode'
+
+k8s_mode() {
+    export PS1="\[\e[33m\][\$(kubectl config current-context)\e[38;5;230m\]|\e[33m\]\$(kubectl config view --minify --output 'jsonpath={..namespace}')] \[\e[0m\]\[\e[32m\]\W\[\e[0m\] \[\e[96m\]> \[\e[0m\]"
+
+}
+
+export PS1="\[\e[91m\] \[\e[0m\]\[\e[91m\]\d\[\e[0m\] \[\e[32m\]\W\[\e[0m\] \[\e[96m\]> \[\e[0m\]"
 
 alias cd-developer="cd /Users/drizzutojr/Developer"
+
+[ -f /usr/local/etc/bash_completion ] && . /usr/local/etc/bash_completion
 
 alias git-branch-name='git rev-parse --abbrev-ref HEAD'
 alias git-publish-nolint='git push origin $(git-branch-name)'
