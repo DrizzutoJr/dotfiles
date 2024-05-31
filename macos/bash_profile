@@ -3,27 +3,49 @@
 export CLICOLOR=1
 export LSCOLORS=gabadaeafaabacadaeafag
 
+### Generic Config
+
+ps1(){
+    if [ "$1" == "git" ]
+    then
+        export PS1="\[\e[95m\][\$(git-branch-name 2>/dev/null || echo '-')\e[38;5;230m\] | \e[95m\]\$(git_status_check 2>/dev/null || echo '-')] \[\e[0m\]\[\e[32m\]\W\[\e[0m\] \[\e[96m\]> \[\e[0m\]"
+    elif [ "$1" == "k8s" ]
+    then
+        export PS1="\[\e[93m\][\$(kubectl config current-context 2>/dev/null || echo '-')\e[38;5;230m\] | \e[93m\]\$(kubectl config view --minify --output 'jsonpath={..namespace}' 2>/dev/null || echo '-')] \[\e[0m\]\[\e[32m\]\W\[\e[0m\] \[\e[96m\]> \[\e[0m\]"
+    else
+        export PS1="\[\e[91m\] \[\e[0m\]\[\e[91m\]\d\[\e[0m\] \[\e[32m\]\W\[\e[0m\] \[\e[96m\]> \[\e[0m\]"
+    fi
+}
+ps1 generic
 echo "ᕦ (ò_ó *) ᕤ"
 
-# Set PATH, MANPATH, etc., for Homebrew.
+
+### Homebrew
+
 eval "$(/opt/homebrew/bin/brew shellenv)"
 export PATH="/opt/homebrew/opt/ruby/bin:$PATH"
 
-alias k8s-mode='k8s_mode'
 
-k8s_mode() {
-    export PS1="\[\e[33m\][\$(kubectl config current-context)\e[38;5;230m\]|\e[33m\]\$(kubectl config view --minify --output 'jsonpath={..namespace}')] \[\e[0m\]\[\e[32m\]\W\[\e[0m\] \[\e[96m\]> \[\e[0m\]"
-
-}
-
-export PS1="\[\e[91m\] \[\e[0m\]\[\e[91m\]\d\[\e[0m\] \[\e[32m\]\W\[\e[0m\] \[\e[96m\]> \[\e[0m\]"
-
-alias cd-developer="cd /Users/drizzutojr/Developer"
-
-[ -f /usr/local/etc/bash_completion ] && . /usr/local/etc/bash_completion
+### Git and Linting
 
 alias git-branch-name='git rev-parse --abbrev-ref HEAD'
 alias git-publish-nolint='git push origin $(git-branch-name)'
+alias git-ps1='git_ps1'
+
+git_status_check() {
+    if [ -n "$(git status --porcelain 2>/dev/null)" ]
+    then
+        echo -n "*"
+        return 0
+    fi
+    if [ -n "$(git log origin/$(git branch --show-current)..HEAD)" ]
+    then
+        echo -n "!"
+        return 0
+    fi
+    return 1
+}
+
 
 lint() {
     has_error=0
@@ -113,6 +135,21 @@ git_publish() {
 }
 
 alias git-publish='git_publish'
+
+# Kubernetes
+
+alias k8s-mode='k8s_mode'
+
+k8s_mode() {
+    export PS1="\[\e[33m\][\$(kubectl config current-context)\e[38;5;230m\]|\e[33m\]\$(kubectl config view --minify --output 'jsonpath={..namespace}')] \[\e[0m\]\[\e[32m\]\W\[\e[0m\] \[\e[96m\]> \[\e[0m\]"
+
+}
+
+alias cd-developer="cd /Users/drizzutojr/Developer"
+
+[ -f /usr/local/etc/bash_completion ] && . /usr/local/etc/bash_completion
+
+
 
 alias vault=bao
 
