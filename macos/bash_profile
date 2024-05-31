@@ -5,20 +5,34 @@ export LSCOLORS=gabadaeafaabacadaeafag
 
 ### Generic Config
 
-ps1(){
-    if [ "$1" == "git" ]
-    then
-        export PS1="\[\e[95m\][\$(git-branch-name 2>/dev/null || echo '-')\e[38;5;230m\] | \e[95m\]\$(git_status_check 2>/dev/null || echo '-')] \[\e[0m\]\[\e[32m\]\W\[\e[0m\] \[\e[96m\]> \[\e[0m\]"
-    elif [ "$1" == "k8s" ]
-    then
-        export PS1="\[\e[93m\][\$(kubectl config current-context 2>/dev/null || echo '-')\e[38;5;230m\] | \e[93m\]\$(kubectl config view --minify --output 'jsonpath={..namespace}' 2>/dev/null || echo '-')] \[\e[0m\]\[\e[32m\]\W\[\e[0m\] \[\e[96m\]> \[\e[0m\]"
-    else
-        export PS1="\[\e[91m\] \[\e[0m\]\[\e[91m\]\d\[\e[0m\] \[\e[32m\]\W\[\e[0m\] \[\e[96m\]> \[\e[0m\]"
-    fi
+ps1() {
+    local ps1_string="\[\e[0m\]\[\e[32m\]\W\[\e[0m\] \[\e[94m\]> \[\e[0m\]"
+
+    for param in "$@"; do
+        if [ "$param" == "git" ]; then
+            ps1_string="\[\e[95m\][\$(git-branch-name 2>/dev/null || echo '-')\[\e[38;5;230m\]||\[\e[95m\]\$(git_status_check 2>/dev/null || echo '-')\[\e[0m\]\[\e[95m\]] \[\e[0m\]$ps1_string"
+        fi
+
+        if [ "$param" == "k8s" ]; then
+            ps1_string="\[\e[93m\][\$(kubectl config current-context 2>/dev/null || echo '-')\[\e[38;5;230m\]||\[\e[93m\]\$(kubectl config view --minify --output 'jsonpath={..namespace}' 2>/dev/null || echo '-')\[\e[0m\]\[\e[93m\]] \[\e[0m\]$ps1_string"
+        fi
+
+        if [ "$param" == "date" ]; then
+            ps1_string="\[\e[91m\]\d\[\e[0m\] $ps1_string"
+        fi
+
+        if [ "$param" == "host" ]; then
+            ps1_string="\[\e[96m\]\h\[\e[0m\] $ps1_string"
+        fi
+    done
+
+    export PS1="$ps1_string"
 }
-ps1 generic
+
+ps1 date
 echo "ᕦ (ò_ó *) ᕤ"
 
+[[ -r "/usr/local/etc/profile.d/bash_completion.sh" ]] && . "/usr/local/etc/profile.d/bash_completion.sh"
 
 ### Homebrew
 
@@ -90,11 +104,13 @@ lint() {
         echo "- Golangci-lint not found.  Skipping golang linting."
     else
         echo "+ Checking Golang"
-        for file in ./*; do
+        repo_root=$(git rev-parse --show-toplevel)
+        echo "+ - Starting golangci-lint in directory: $repo_root"
+        for file in "$repo_root"/*; do
             if [ -d "$file" ]; then
                 for subfile in "$file"/*; do
                     if [ -f "$subfile" ] && [[ "$(basename "$subfile")" == "main.go" ]]; then
-                        echo "+ - Running golangci-lint in directory: $file"
+                        echo "+ - Go Directory: $file"
                         pushd "$file" > /dev/null
                         golangci-lint run -E bodyclose --timeout 5m0s
                         if [ $? -ne 0 ]; then
@@ -136,20 +152,13 @@ git_publish() {
 
 alias git-publish='git_publish'
 
-# Kubernetes
 
-alias k8s-mode='k8s_mode'
+### Kubernetes
 
-k8s_mode() {
-    export PS1="\[\e[33m\][\$(kubectl config current-context)\e[38;5;230m\]|\e[33m\]\$(kubectl config view --minify --output 'jsonpath={..namespace}')] \[\e[0m\]\[\e[32m\]\W\[\e[0m\] \[\e[96m\]> \[\e[0m\]"
-
-}
-
-alias cd-developer="cd /Users/drizzutojr/Developer"
-
-[ -f /usr/local/etc/bash_completion ] && . /usr/local/etc/bash_completion
+alias k='kubectl'
 
 
+### Vault and OpenBao
 
 alias vault=bao
 
@@ -171,3 +180,8 @@ bao() {
         /usr/local/bin/bao "$@"
     fi
 }
+
+
+### Home Laptop
+
+alias cd-developer="cd /Users/drizzutojr/Developer"
