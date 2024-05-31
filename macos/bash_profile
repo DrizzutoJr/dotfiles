@@ -10,11 +10,11 @@ ps1() {
 
     for param in "$@"; do
         if [ "$param" == "git" ]; then
-            ps1_string="\[\e[95m\][\$(git-branch-name 2>/dev/null || echo '-')\[\e[38;5;230m\]||\[\e[95m\]\$(git_status_check 2>/dev/null || echo '-')\[\e[0m\]\[\e[95m\]] \[\e[0m\]$ps1_string"
+            ps1_string="\[\e[95m\][\$(git-branch-name 2>/dev/null || echo '-')\[\e[38;5;230m\]|\[\e[95m\]\$(git_status_check 2>/dev/null || echo '-')\[\e[0m\]\[\e[95m\]] \[\e[0m\]$ps1_string"
         fi
 
         if [ "$param" == "k8s" ]; then
-            ps1_string="\[\e[93m\][\$(kubectl config current-context 2>/dev/null || echo '-')\[\e[38;5;230m\]||\[\e[93m\]\$(kubectl config view --minify --output 'jsonpath={..namespace}' 2>/dev/null || echo '-')\[\e[0m\]\[\e[93m\]] \[\e[0m\]$ps1_string"
+            ps1_string="\[\e[93m\][\$(kubectl config current-context 2>/dev/null || echo '-')\[\e[38;5;230m\]|\[\e[93m\]\$(kubectl config view --minify --output 'jsonpath={..namespace}' 2>/dev/null || echo '-')\[\e[0m\]\[\e[93m\]] \[\e[0m\]$ps1_string"
         fi
 
         if [ "$param" == "date" ]; then
@@ -24,12 +24,18 @@ ps1() {
         if [ "$param" == "host" ]; then
             ps1_string="\[\e[96m\]\h\[\e[0m\] $ps1_string"
         fi
+
     done
+
+
+    if [ -n "$VIRTUAL_ENV" ]; then
+        ps1_string="\[\e[97m\](\$(basename $VIRTUAL_ENV)) \[\e[0m\]$ps1_string"
+    fi
 
     export PS1="$ps1_string"
 }
 
-ps1 date
+ps1 date venv
 echo "ᕦ (ò_ó *) ᕤ"
 
 [[ -r "/usr/local/etc/profile.d/bash_completion.sh" ]] && . "/usr/local/etc/profile.d/bash_completion.sh"
