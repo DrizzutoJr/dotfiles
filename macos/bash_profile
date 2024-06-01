@@ -38,6 +38,7 @@ ps1() {
 ps1 date venv
 echo "ᕦ (ò_ó *) ᕤ"
 
+# shellcheck disable=SC1091
 [[ -r "/usr/local/etc/profile.d/bash_completion.sh" ]] && . "/usr/local/etc/profile.d/bash_completion.sh"
 
 ### Homebrew
@@ -58,6 +59,7 @@ git_status_check() {
         echo -n "*"
         return 0
     fi
+    # shellcheck disable=SC2046
     if [ -n "$(git log origin/$(git branch --show-current)..HEAD)" ]
     then
         echo -n "!"
@@ -75,7 +77,7 @@ lint() {
     else
         echo "+ Checking Terraform"
         terraform fmt -check -recursive
-        if [ $? -ne 0 ]; then
+        if ! terraform fmt -check -recursive; then
             has_error=1
         fi
     fi
@@ -85,21 +87,20 @@ lint() {
     else
         echo "+ Checking Opentofu"
         tofu fmt -check -recursive
-        if [ $? -ne 0 ]; then
+        if ! tofu fmt -check -recursive; then
             has_error=1
         fi
     fi
 
     if [[ -n $VIRTUAL_ENV ]]; then
         echo "+ Virtual Env Found.  Checking Python via Black"
-        black --check .
-        if [ $? -ne 0 ]; then
+        if ! black --check .; then
             has_error=1
         fi
     elif command -v black &> /dev/null; then
         echo "+ Checking Python via Black"
         black --check .
-        if [ $? -ne 0 ]; then
+        if ! black --check .; then
             has_error=1
         fi
     else
@@ -117,12 +118,12 @@ lint() {
                 for subfile in "$file"/*; do
                     if [ -f "$subfile" ] && [[ "$(basename "$subfile")" == "main.go" ]]; then
                         echo "+ - Go Directory: $file"
-                        pushd "$file" > /dev/null
+                        pushd "$file" > /dev/null || exit
                         golangci-lint run -E bodyclose --timeout 5m0s
-                        if [ $? -ne 0 ]; then
+                        if ! golangci-lint run -E bodyclose --timeout 5m0s; then
                             has_error=1
                         fi
-                        popd > /dev/null
+                        popd > /dev/null || exit
                         break
                     fi
                 done
@@ -134,8 +135,7 @@ lint() {
         echo "- Shellcheck not found.  Skipping shell linting."
     else
         echo "+ Checking Shell"
-        find "${1:-.}" -not -path '*/.git/*' -type f -exec grep -Eq '^#!(.*/|.*env +)(sh|bash|ksh)' {} \; -exec shellcheck {} +
-        if [ $? -ne 0 ]; then
+        if ! find . -not -path '*/.git/*' -type f -exec grep -Eq '^#!(.*/|.*env +)(sh|bash|ksh)' {} \; -exec shellcheck {} +; then
             has_error=1
         fi
     fi
