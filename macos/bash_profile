@@ -166,7 +166,7 @@ alias k='kubectl'
 
 ### Vault and OpenBao
 
-alias vault=bao
+alias vault="echo 'using bao' && bao"
 
 bao() {
     export BAO_CACERT="/Users/drizzutojr/Developer/Projects/HomeLab/Certs/CA.pem"
@@ -187,7 +187,13 @@ bao() {
     fi
 }
 
+### Terraform
+
+alias terraform="echo 'using tofu' && tofu"
+
 
 ### Home Laptop
 
 alias cd-developer="cd /Users/drizzutojr/Developer"
+alias cd-homelab="cd /Users/drizzutojr/Developer"
+alias cd-dotfiles="cd /Users/drizzutojr/Developer/Projects/Drizzutojr/dotfiles"
