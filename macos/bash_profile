@@ -191,9 +191,15 @@ bao() {
 
 alias terraform="echo 'using tofu' && tofu"
 
+### Homelab k8s
+
+alias k="kubectl"
+alias k-setns="kubectl config set-context --current --namespace"
+alias k-dev="export KUBECONFIG=~/.kube/dev.k8s.homelab-config; kubectl"
+alias k-prod="export KUBECONFIG=~/.kube/dk8s.homelab-config; kubectl"
 
 ### Home Laptop
 
 alias cd-developer="cd /Users/drizzutojr/Developer"
-alias cd-homelab="cd /Users/drizzutojr/Developer"
+alias cd-homelab="cd /Users/drizzutojr/Developer/Projects/HomeLab"
 alias cd-dotfiles="cd /Users/drizzutojr/Developer/Projects/Drizzutojr/dotfiles"
