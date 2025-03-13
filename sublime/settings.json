@@ -1,0 +1,12 @@
+{
+    "color_scheme": "Packages/User/Colors/CandyLand.tmTheme",
+    "font_size": 12,
+    "ignored_packages":
+    [
+      "Git",
+      "Vintage",
+    ],
+    "tab_size": 2,
+    "translate_tabs_to_spaces": true,
+  }
+  
