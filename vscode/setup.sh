@@ -15,7 +15,7 @@ EXTENSIONS_EXTERNAL_FILE_NAME="external.yaml"
 EXTENSIONS_EXTERNAL_FILE_PATH="${EXTENSIONS_FULL_DIR}/${EXTENSIONS_EXTERNAL_FILE_NAME}"
 
 if ! command -v code &> /dev/null; then
-    echo "Error: VS Code is not installed. Please install it first." >&2
+    echo "! Error: VS Code is not installed. Please install it first." >&2
     exit 1
 fi
 
@@ -28,7 +28,7 @@ for vsix_file in "$EXTENSIONS_FULL_DIR"/*/*.vsix; do
 done
 
 if ! command -v yq &> /dev/null; then
-    echo "Error: yq not installed. Please install it first." >&2
+    echo "! Error: yq not installed. Please install it first." >&2
     exit 1
 fi
 

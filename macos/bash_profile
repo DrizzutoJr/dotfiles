@@ -166,26 +166,26 @@ alias k='kubectl'
 
 ### Vault and OpenBao
 
-alias vault="echo 'using bao' && bao"
+# alias vault="echo 'using bao' && bao"
 
-bao() {
-    export BAO_CACERT="/Users/drizzutojr/Developer/Projects/HomeLab/Certs/CA.pem"
-    if [[ "$1" == "local" ]]
-    then
-        shift 1
-        BAO_ADDR="http://127.0.0.1:8200" /usr/local/bin/bao "$@"
-    elif [[ "$1" == "dev" ]]
-    then
-        shift 1
-        BAO_ADDR="https://dev.openbao.homelab:8200" /usr/local/bin/bao "$@"
-    elif [[ "$1" == "prod" ]]
-    then
-        shift 1
-        BAO_ADDR="https://openbao.homelab:8200" /usr/local/bin/bao "$@"
-    else
-        /usr/local/bin/bao "$@"
-    fi
-}
+# bao() {
+#     export BAO_CACERT="/Users/drizzutojr/Developer/Projects/HomeLab/Certs/CA.pem"
+#     if [[ "$1" == "local" ]]
+#     then
+#         shift 1
+#         BAO_ADDR="http://127.0.0.1:8200" /usr/local/bin/bao "$@"
+#     elif [[ "$1" == "dev" ]]
+#     then
+#         shift 1
+#         BAO_ADDR="https://dev.openbao.homelab:8200" /usr/local/bin/bao "$@"
+#     elif [[ "$1" == "prod" ]]
+#     then
+#         shift 1
+#         BAO_ADDR="https://openbao.homelab:8200" /usr/local/bin/bao "$@"
+#     else
+#         /usr/local/bin/bao "$@"
+#     fi
+# }
 
 ### Terraform
 
