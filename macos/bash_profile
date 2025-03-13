@@ -68,16 +68,6 @@ git_status_check() {
 lint() {
     has_error=0
 
-    if ! command -v terraform &> /dev/null; then
-        echo "- Terraform not found.  Skipping terraform linting."
-    else
-        echo "+ Checking Terraform"
-        terraform fmt -check -recursive
-        if ! terraform fmt -check -recursive; then
-            has_error=1
-        fi
-    fi
-
     if ! command -v tofu &> /dev/null; then
         echo "- Opentofu not found.  Skipping Opentofu linting."
     else
@@ -204,7 +194,7 @@ alias cd-dotfiles="cd /Users/drizzutojr/Developer/Projects/Drizzutojr/dotfiles"
 developer() {
     ps1 git k8s host
     echo "Changing to Developer Directory"
-    cd /Users/drizzutojr/Developer
+    cd /Users/drizzutojr/Developer || return
 }
 
 #### Setup

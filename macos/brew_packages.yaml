@@ -4,3 +4,4 @@ packages:
 - tmux
 - openbao
 - opentofu
+- shellcheck
