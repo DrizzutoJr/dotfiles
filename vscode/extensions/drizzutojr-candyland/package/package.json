@@ -1,0 +1,21 @@
+{
+  "name": "drizzutojr-candyland",
+  "displayName": "drizzutojr-candyland",
+  "description": "Candyland with Danny's preferences",
+  "version": "0.0.2",
+  "engines": {
+    "vscode": "^1.79.0"
+  },
+  "categories": [
+    "Themes"
+  ],
+  "contributes": {
+    "themes": [
+      {
+        "label": "Drizzutojr Candyland",
+        "uiTheme": "vs",
+        "path": "./themes/Drizzutojr Candyland-color-theme.json"
+      }
+    ]
+  }
+}
