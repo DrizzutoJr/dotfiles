@@ -3,6 +3,7 @@
 export CLICOLOR=1
 export LSCOLORS=gabadaeafaabacadaeafag
 
+
 ### Generic Config
 
 ps1() {
@@ -35,11 +36,6 @@ ps1() {
     export PS1="$ps1_string"
 }
 
-ps1 date venv
-echo "ᕦ (ò_ó *) ᕤ"
-
-# shellcheck disable=SC1091
-[[ -r "/usr/local/etc/profile.d/bash_completion.sh" ]] && . "/usr/local/etc/profile.d/bash_completion.sh"
 
 ### Homebrew
 
@@ -143,6 +139,7 @@ lint() {
     return $has_error
 }
 
+alias git-publish='git_publish'
 git_publish() {
     if ! lint; then
         echo ":( Linting failed.  Not publishing."
@@ -156,8 +153,6 @@ git_publish() {
     git-publish-nolint
 }
 
-alias git-publish='git_publish'
-
 
 ### Kubernetes
 
@@ -166,22 +161,23 @@ alias k='kubectl'
 
 ### Vault and OpenBao
 
-# alias vault="echo 'using bao' && bao"
+alias vault="echo '! using bao !' && bao"
 
+# BAO_BINARY_PATH="/opt/homebrew/bin/bao"
 # bao() {
 #     export BAO_CACERT="/Users/drizzutojr/Developer/Projects/HomeLab/Certs/CA.pem"
 #     if [[ "$1" == "local" ]]
 #     then
 #         shift 1
-#         BAO_ADDR="http://127.0.0.1:8200" /usr/local/bin/bao "$@"
+#         BAO_ADDR="http://127.0.0.1:8200" $BAO_BINARY_PATH "$@"
 #     elif [[ "$1" == "dev" ]]
 #     then
 #         shift 1
-#         BAO_ADDR="https://dev.openbao.homelab:8200" /usr/local/bin/bao "$@"
+#         BAO_ADDR="https://dev.openbao.homelab:8200" $BAO_BINARY_PATH "$@"
 #     elif [[ "$1" == "prod" ]]
 #     then
 #         shift 1
-#         BAO_ADDR="https://openbao.homelab:8200" /usr/local/bin/bao "$@"
+#         BAO_ADDR="https://openbao.homelab:8200" $BAO_BINARY_PATH "$@"
 #     else
 #         /usr/local/bin/bao "$@"
 #     fi
@@ -189,7 +185,7 @@ alias k='kubectl'
 
 ### Terraform
 
-alias terraform="echo 'using tofu' && tofu"
+alias terraform="echo '! using tofu !' && tofu"
 
 ### Homelab k8s
 
@@ -203,3 +199,17 @@ alias k-prod="export KUBECONFIG=~/.kube/dk8s.homelab-config; kubectl"
 alias cd-developer="cd /Users/drizzutojr/Developer"
 alias cd-homelab="cd /Users/drizzutojr/Developer/Projects/HomeLab"
 alias cd-dotfiles="cd /Users/drizzutojr/Developer/Projects/Drizzutojr/dotfiles"
+
+### Developer
+developer() {
+    ps1 git k8s host
+    echo "Changing to Developer Directory"
+    cd /Users/drizzutojr/Developer
+}
+
+#### Setup
+ps1 date venv
+echo "ᕦ (ò_ó *) ᕤ"
+
+# shellcheck disable=SC1091
+[[ -r "/usr/local/etc/profile.d/bash_completion.sh" ]] && . "/usr/local/etc/profile.d/bash_completion.sh"

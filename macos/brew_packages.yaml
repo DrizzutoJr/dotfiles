@@ -3,3 +3,4 @@ packages:
 - bentobox
 - tmux
 - openbao
+- opentofu
