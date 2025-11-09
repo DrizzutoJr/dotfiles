@@ -1,7 +1,7 @@
 #!/bin/bash
 
-read -p "Enter username: " USER
-read -p "Enter IP/Server: " IP
+read -r -p "Enter username: " USER
+read -r -p "Enter IP/Server: " IP
 
 # iTerm2 escape sequences for tab title and badge
 # \033]0;TEXT\a sets the tab/window title

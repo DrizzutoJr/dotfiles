@@ -7,9 +7,7 @@ TMUX=/opt/homebrew/bin/tmux
 SESSION="local_split"
 
 # Check if session exists
-$TMUX has-session -t "$SESSION" 2>/dev/null
-
-if [ $? != 0 ]; then
+if ! $TMUX has-session -t "$SESSION" 2>/dev/null; then
   # Session doesn't exist → create it with horizontal split, top pane active
   $TMUX new-session -s "$SESSION" -n main \; \
     split-window -v -c "#{pane_current_path}" \; \

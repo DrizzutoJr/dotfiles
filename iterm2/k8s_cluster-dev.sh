@@ -8,11 +8,11 @@ export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
 DEFAULT_USER="homelab"
 
 # Prompt for username
-read -p "Enter SSH username ($DEFAULT_USER) > " SSH_USER
+read -r -p "Enter SSH username ($DEFAULT_USER) > " SSH_USER
 SSH_USER=${SSH_USER:-$DEFAULT_USER}
 
 # Prompt for password (optional, will fallback to key auth). Hidden input.
-read -s -p "Enter SSH password (leave blank for key auth) > " SSH_PASS
+read -r -s -p "Enter SSH password (leave blank for key auth) > " SSH_PASS
 echo ""
 
 # Name of the tmux session

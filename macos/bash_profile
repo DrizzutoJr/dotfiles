@@ -217,15 +217,6 @@ homelab() {
     fi
 }
 
-### Dotfiles
-    badge "Dotfiles"
-    if [[ "$1" == "-" ]]
-    then
-        echo "Changing to Dotfiles Directory"
-        cd /Users/drizzutojr/Developer/Projects/Drizzutojr/dotfiles || return
-        open -g -a "Visual Studio Code" .
-    fi
-
 ### iTerm2
 
 badge() {
@@ -240,3 +231,12 @@ echo "ᕦ (ò_ó *) ᕤ"
 
 # shellcheck disable=SC1091
 [[ -r "/usr/local/etc/profile.d/bash_completion.sh" ]] && . "/usr/local/etc/profile.d/bash_completion.sh"
+
+### Dotfiles
+    badge "Dotfiles"
+    if [[ "$1" == "-" ]]
+    then
+        echo "Changing to Dotfiles Directory"
+        cd /Users/drizzutojr/Developer/Projects/Drizzutojr/dotfiles || return
+        open -g -a "Visual Studio Code" .
+    fi
