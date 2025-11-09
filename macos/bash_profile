@@ -191,11 +191,48 @@ alias cd-homelab="cd /Users/drizzutojr/Developer/Projects/HomeLab"
 alias cd-dotfiles="cd /Users/drizzutojr/Developer/Projects/Drizzutojr/dotfiles"
 
 ### Developer
+
 developer() {
+    badge "Developer"
     ps1 git k8s host
-    echo "Changing to Developer Directory"
-    cd /Users/drizzutojr/Developer || return
+    if [[ "$1" == "-" ]]
+    then
+        echo "Changing to Developer Directory"
+        cd /Users/drizzutojr/Developer || return
+        open -g -a "Visual Studio Code" .
+    fi
 }
+
+
+### HomeLab
+
+homelab() {
+    badge "HomeLab"
+    ps1 git k8s host
+    if [[ "$1" == "-" ]]
+    then
+        echo "Changing to HomeLab Directory"
+        cd /Users/drizzutojr/Developer/Projects/HomeLab || return
+        open -g -a "Visual Studio Code" .
+    fi
+}
+
+### Dotfiles
+    badge "Dotfiles"
+    if [[ "$1" == "-" ]]
+    then
+        echo "Changing to Dotfiles Directory"
+        cd /Users/drizzutojr/Developer/Projects/Drizzutojr/dotfiles || return
+        open -g -a "Visual Studio Code" .
+    fi
+
+### iTerm2
+
+badge() {
+    badgeMessage="$1"
+    echo -ne "\033]1337;SetBadgeFormat=$(echo -n "$badgeMessage" | base64)\a"
+}
+
 
 #### Setup
 ps1 date venv
