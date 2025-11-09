@@ -33,7 +33,12 @@ ps1() {
         ps1_string="\[\e[97m\](\$(basename $VIRTUAL_ENV)) \[\e[0m\]$ps1_string"
     fi
 
-    export PS1="$ps1_string"
+    if [ "$#" -ne 0 ]; then
+        export PS1="$ps1_string"
+    else
+        echo "git, k8s, date, host"
+    fi
+
 }
 
 

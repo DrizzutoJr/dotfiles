@@ -30,9 +30,6 @@ if ! command -v brew &> /dev/null; then
     exit 1
 fi
 
-echo "..Installing yq"
-brew install yq
-
 echo "Installing homebrew packages"
 for package in $(yq '.packages[]' "$BREW_PACKAGES_FILE_PATH"); do
     echo "..Installing brew package: $package"
