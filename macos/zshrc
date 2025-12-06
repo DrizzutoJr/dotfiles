@@ -1,0 +1,247 @@
+#!/bin/zsh
+
+export CLICOLOR=1
+export LSCOLORS=gabadaeafaabacadaeafag
+
+
+### Generic Config
+
+autoload -Uz add-zsh-hook
+
+ps1() {
+    local ps1_string="%F{green}%1~%f %F{blue}>%f "
+    local precmd_funcs=()
+
+    for param in "$@"; do
+        if [[ "$param" == "git" ]]; then
+            ps1_string='%F{magenta}[$(git-branch-name 2>/dev/null || echo "-")|$(git_status_check 2>/dev/null || echo "-")]%f '"$ps1_string"
+        fi
+
+        if [[ "$param" == "k8s" ]]; then
+            ps1_string='%F{yellow}[$(kubectl config current-context 2>/dev/null || echo "-")|$(kubectl config view --minify --output "jsonpath={..namespace}" 2>/dev/null || echo "-")]%f '"$ps1_string"
+        fi
+
+        if [[ "$param" == "date" ]]; then
+            ps1_string='%F{red}%D{%a %b %d}%f '"$ps1_string"
+        fi
+
+        if [[ "$param" == "host" ]]; then
+            ps1_string='%F{cyan}%m%f '"$ps1_string"
+        fi
+
+        if [[ "$param" == "venv" ]]; then
+            ps1_string='%(1V.%F{white}(%1v)%f .)'"$ps1_string"
+            precmd_funcs+=(_update_venv)
+        fi
+    done
+
+    if [[ "$#" -ne 0 ]]; then
+        setopt PROMPT_SUBST
+        export PS1="$ps1_string"
+
+        # Set up precmd hooks for dynamic updates
+        if (( ${#precmd_funcs[@]} > 0 )); then
+            for func in "${precmd_funcs[@]}"; do
+                add-zsh-hook precmd $func
+            done
+        fi
+    else
+        echo "git, k8s, date, host, venv"
+    fi
+}
+
+_update_venv() {
+    if [[ -n "$VIRTUAL_ENV" ]]; then
+        psvar[1]=$(basename "$VIRTUAL_ENV")
+    else
+        psvar[1]=''
+    fi
+}
+
+
+### Homebrew
+
+eval "$(/opt/homebrew/bin/brew shellenv)"
+export PATH="/opt/homebrew/opt/ruby/bin:$PATH"
+
+
+### Git and Linting
+
+alias git-branch-name='git rev-parse --abbrev-ref HEAD'
+alias git-publish-nolint='git push origin $(git-branch-name)'
+
+git_status_check() {
+    if [[ -n "$(git status --porcelain 2>/dev/null)" ]]; then
+        echo -n "*"
+        return 0
+    fi
+    if [[ -n "$(git log origin/$(git branch --show-current)..HEAD 2>/dev/null)" ]]; then
+        echo -n "!"
+        return 0
+    fi
+    return 1
+}
+
+
+lint() {
+    local has_error=0
+
+    if ! command -v tofu &> /dev/null; then
+        echo "- Opentofu not found.  Skipping Opentofu linting."
+    else
+        echo "+ Checking Opentofu"
+        if ! tofu fmt -check -recursive; then
+            has_error=1
+        fi
+    fi
+
+    if [[ -n $VIRTUAL_ENV ]]; then
+        echo "+ Virtual Env Found.  Checking Python via Black"
+        if ! black --check .; then
+            has_error=1
+        fi
+    elif command -v black &> /dev/null; then
+        echo "+ Checking Python via Black"
+        if ! black --check .; then
+            has_error=1
+        fi
+    else
+        echo "- No Virtual Env or Black Found.  Skipping Python linting."
+    fi
+
+    if ! command -v golangci-lint &> /dev/null; then
+        echo "- Golangci-lint not found.  Skipping golang linting."
+    else
+        echo "+ Checking Golang"
+        local repo_root=$(git rev-parse --show-toplevel)
+        echo "+ - Starting golangci-lint in directory: $repo_root"
+        for file in "$repo_root"/*; do
+            if [[ -d "$file" ]]; then
+                for subfile in "$file"/*; do
+                    if [[ -f "$subfile" ]] && [[ "$(basename "$subfile")" == "main.go" ]]; then
+                        echo "+ - Go Directory: $file"
+                        pushd "$file" > /dev/null || return 1
+                        if ! golangci-lint run -E bodyclose --timeout 5m0s; then
+                            has_error=1
+                        fi
+                        popd > /dev/null || return 1
+                        break
+                    fi
+                done
+            fi
+        done
+    fi
+
+    if ! command -v shellcheck &> /dev/null; then
+        echo "- Shellcheck not found.  Skipping shell linting."
+    else
+        echo "+ Checking Shell"
+        if ! find . -not -path '*/.git/*' -type f -exec grep -Eq '^#!(.*/|.*env +)(sh|bash|ksh)' {} \; -exec shellcheck {} +; then
+            has_error=1
+        fi
+    fi
+
+    return $has_error
+}
+
+alias git-publish='git_publish'
+git_publish() {
+    if ! lint; then
+        echo ":( Linting failed.  Not publishing."
+        return 1
+    fi
+
+    echo ":) Linting passed.  Publishing."
+    echo "   --    ____"
+    echo "  ---  /|_||_\`.__"
+    echo "   -- (   _    _ _\\"
+    git-publish-nolint
+}
+
+
+### Kubernetes
+
+alias k='kubectl'
+alias k-setns='kubectl config set-context --current --namespace'
+alias k-dev='export KUBECONFIG=~/.kube/dev.k8s.homelab-config; kubectl'
+alias k-prod='export KUBECONFIG=~/.kube/prod.k8s.homelab-config; kubectl'
+
+
+### Vault and OpenBao
+
+alias vault="echo '! using bao !' && bao"
+
+
+### Terraform
+
+alias terraform="echo '! using tofu !' && tofu"
+
+
+### Home Laptop
+
+alias cd-developer='cd /Users/drizzutojr/Developer'
+alias cd-homelab='cd /Users/drizzutojr/Developer/Projects/HomeLab'
+alias cd-dotfiles='cd /Users/drizzutojr/Developer/Projects/dotfiles'
+
+
+### Developer
+
+developer() {
+    badge "Developer"
+    ps1 git k8s host
+    if [[ "$1" == "-" ]]; then
+        echo "Changing to Developer Directory"
+        cd /Users/drizzutojr/Developer || return
+        open -g -a "Visual Studio Code" .
+    fi
+}
+
+
+### HomeLab
+
+homelab() {
+    badge "HomeLab"
+    ps1 git k8s host
+    if [[ "$1" == "-" ]]; then
+        echo "Changing to HomeLab Directory"
+        cd /Users/drizzutojr/Developer/Projects/HomeLab || return
+        open -g -a "Visual Studio Code" .
+    fi
+}
+
+
+### Dotfiles
+
+dotfiles() {
+    badge "Dotfiles"
+    ps1 git k8s host
+    if [[ "$1" == "-" ]]; then
+        echo "Changing to Dotfiles Directory"
+        cd /Users/drizzutojr/Developer/Projects/dotfiles || return
+        open -g -a "Visual Studio Code" .
+    fi
+}
+
+
+### iTerm2
+
+badge() {
+    local badgeMessage="$1"
+    echo -ne "\033]1337;SetBadgeFormat=$(echo -n "$badgeMessage" | base64)\a"
+}
+
+
+### VSCode + Tmux Auto-Split
+
+if [[ "$TERM_PROGRAM" == "vscode" ]] && [[ -z "$TMUX" ]]; then
+    exec tmux new-session \; split-window -h \; send-keys 'claude' Enter \; select-pane -L
+fi
+
+
+### Setup
+
+ps1 date venv
+echo "ᕦ (ò_ó *) ᕤ"
+
+# Zsh completion
+autoload -Uz compinit && compinit

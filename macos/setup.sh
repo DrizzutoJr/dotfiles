@@ -13,7 +13,7 @@ BREW_PACKAGES_FILE_NAME="brew_packages.yaml"
 BREW_PACKAGES_FILE_PATH="${CURRENT_DIR}/${BREW_PACKAGES_FILE_NAME}"
 
 echo "Changing shell to bash"
-chsh -s /bin/bash
+chsh -s /bin/zsh
 
 echo "Setting up local user bash profile"
 if [ -f "$FILE_PATH" ] && [ ! -L "$FILE_PATH" ]; then
