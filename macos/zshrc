@@ -1,7 +1,12 @@
 #!/bin/zsh
 
 export CLICOLOR=1
-export LSCOLORS=gabadaeafaabacadaeafag
+export LSCOLORS=gxbxdxexfxabacadaeafag
+
+# Use bright white for default text (helps with VS Code terminal appearing grey)
+export TERM="xterm-256color"
+autoload -U colors && colors
+echo -ne "\033[97m"
 
 
 ### Generic Config
@@ -9,28 +14,30 @@ export LSCOLORS=gabadaeafaabacadaeafag
 autoload -Uz add-zsh-hook
 
 ps1() {
-    local ps1_string="%F{green}%1~%f %F{blue}>%f "
+    # Using bright/bold 256-color codes for better visibility
+    # 10=bright green, 12=bright blue, 13=bright magenta, 11=bright yellow, 9=bright red, 14=bright cyan, 15=bright white
+    local ps1_string="%F{10}%1~%f %F{12}>%f "
     local precmd_funcs=()
 
     for param in "$@"; do
         if [[ "$param" == "git" ]]; then
-            ps1_string='%F{magenta}[$(git-branch-name 2>/dev/null || echo "-")|$(git_status_check 2>/dev/null || echo "-")]%f '"$ps1_string"
+            ps1_string='%F{13}[$(git-branch-name 2>/dev/null || echo "-")|$(git_status_check 2>/dev/null || echo "-")]%f '"$ps1_string"
         fi
 
         if [[ "$param" == "k8s" ]]; then
-            ps1_string='%F{yellow}[$(kubectl config current-context 2>/dev/null || echo "-")|$(kubectl config view --minify --output "jsonpath={..namespace}" 2>/dev/null || echo "-")]%f '"$ps1_string"
+            ps1_string='%F{11}[$(kubectl config current-context 2>/dev/null || echo "-")|$(kubectl config view --minify --output "jsonpath={..namespace}" 2>/dev/null || echo "-")]%f '"$ps1_string"
         fi
 
         if [[ "$param" == "date" ]]; then
-            ps1_string='%F{red}%D{%a %b %d}%f '"$ps1_string"
+            ps1_string='%F{9}%D{%a %b %d}%f '"$ps1_string"
         fi
 
         if [[ "$param" == "host" ]]; then
-            ps1_string='%F{cyan}%m%f '"$ps1_string"
+            ps1_string='%F{14}%m%f '"$ps1_string"
         fi
 
         if [[ "$param" == "venv" ]]; then
-            ps1_string='%(1V.%F{white}(%1v)%f .)'"$ps1_string"
+            ps1_string='%(1V.%F{15}(%1v)%f .)'"$ps1_string"
             precmd_funcs+=(_update_venv)
         fi
     done
@@ -232,7 +239,6 @@ badge() {
 
 
 ### VSCode + Tmux Auto-Split
-
 if [[ "$TERM_PROGRAM" == "vscode" ]] && [[ -z "$TMUX" ]]; then
     exec tmux new-session \; split-window -h \; send-keys 'claude' Enter \; select-pane -L
 fi
