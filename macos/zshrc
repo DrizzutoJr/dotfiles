@@ -86,7 +86,8 @@ git_status_check() {
         echo -n "!"
         return 0
     fi
-    return 1
+    echo -n "-"
+    return 0
 }
 
 
