@@ -1,5 +1,59 @@
 {
+    // Appearance
     "workbench.colorTheme": "Drizzutojr Candyland",
-    "window.newWindowProfile": "drizzutojr",
-    "redhat.telemetry.enabled": false
+    "workbench.panel.defaultLocation": "bottom",
+    "workbench.sideBar.location": "left",
+    "workbench.startupEditor": "none",
+    "editor.minimap.enabled": false,
+    "editor.fontSize": 13,
+    "editor.lineHeight": 1.6,
+    "workbench.tree.indent": 16,
+    "workbench.colorCustomizations": {
+        "terminal.foreground": "#FFFFFF",
+        "list.activeSelectionBackground": "#000000",
+        "list.inactiveSelectionBackground": "#000000",
+        "list.inactiveSelectionForeground": "#ffffff"
+    },
+    // Editor Behavior
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true,
+    "editor.formatOnSave": true,
+    "editor.formatOnPaste": true,
+    "editor.bracketPairColorization.enabled": true,
+    "editor.guides.bracketPairs": true,
+    "editor.linkedEditing": true,
+    "editor.stickyScroll.enabled": true,
+    "editor.cursorBlinking": "smooth",
+    "editor.cursorSmoothCaretAnimation": "on",
+    // File Management
+    "files.autoSave": "afterDelay",
+    "files.autoSaveDelay": 1000,
+    "files.trimTrailingWhitespace": true,
+    "files.insertFinalNewline": true,
+    // Terminal
+    "terminal.integrated.fontSize": 14,
+    "terminal.integrated.cursorBlinking": true,
+    "terminal.integrated.defaultProfile.osx": "zsh",
+    // Git
+    "git.openRepositoryInParentFolders": "never",
+    "git.autofetch": true,
+    "git.confirmSync": false,
+    "git.enableSmartCommit": true,
+    // Extensions
+    "redhat.telemetry.enabled": false,
+    "go.toolsManagement.autoUpdate": true,
+    "github.copilot.nextEditSuggestions.enabled": true,
+    "github.copilot.enable": {
+        "*": true
+    },
+    "docker.extension.enableComposeLanguageServer": false,
+    // Performance
+    "extensions.autoUpdate": true,
+    "search.exclude": {
+        "**/node_modules": true,
+        "**/dist": true,
+        "**/build": true,
+        "**/.git": true
+    },
+    "workbench.preferredLightColorTheme": "Drizzutojr Candyland"
 }
