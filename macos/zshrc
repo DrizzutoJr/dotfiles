@@ -79,14 +79,14 @@ alias git-publish-nolint='git push origin $(git-branch-name)'
 
 git_status_check() {
     if [[ -n "$(git status --porcelain 2>/dev/null)" ]]; then
-        echo -n "*"
+        printf "*"
         return 0
     fi
     if git rev-parse --verify origin/$(git branch --show-current) &>/dev/null && [[ -n "$(git log origin/$(git branch --show-current)..HEAD 2>/dev/null)" ]]; then
-        echo -n "!"
+        printf "!"
         return 0
     fi
-    echo -n "-"
+    printf "-"
     return 0
 }
 
