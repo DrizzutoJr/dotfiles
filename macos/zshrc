@@ -19,28 +19,30 @@ ps1() {
     local ps1_string="%F{10}%1~%f %F{12}>%f "
     local precmd_funcs=()
 
+    local prefix=""
     for param in "$@"; do
         if [[ "$param" == "git" ]]; then
-            ps1_string='%F{13}[$(git-branch-name 2>/dev/null || echo "-")|$(git_status_check 2>/dev/null || echo "-")]%f '"$ps1_string"
+            prefix+='%F{13}[$(git-branch-name 2>/dev/null || echo "-")|$(git_status_check 2>/dev/null || echo "-")]%f '
         fi
 
         if [[ "$param" == "k8s" ]]; then
-            ps1_string='%F{11}[$(kubectl config current-context 2>/dev/null || echo "-")|$(ns=$(kubectl config view --minify -o "jsonpath={..namespace}" 2>/dev/null); echo "${ns:-default}")]%f '"$ps1_string"
+            prefix+='%F{11}[$(kubectl config current-context 2>/dev/null || echo "-")|$(ns=$(kubectl config view --minify -o "jsonpath={..namespace}" 2>/dev/null); echo "${ns:-default}")]%f '
         fi
 
         if [[ "$param" == "date" ]]; then
-            ps1_string='%F{9}%D{%a %b %d}%f '"$ps1_string"
+            prefix+='%F{9}%D{%a %b %d}%f '
         fi
 
         if [[ "$param" == "host" ]]; then
-            ps1_string='%F{14}%m%f '"$ps1_string"
+            prefix+='%F{14}%m%f '
         fi
 
         if [[ "$param" == "venv" ]]; then
-            ps1_string='%(1V.%F{15}(%1v)%f .)'"$ps1_string"
+            prefix+='%(1V.%F{15}(%1v)%f .)'
             precmd_funcs+=(_update_venv)
         fi
     done
+    ps1_string="${prefix}${ps1_string}"
 
     if [[ "$#" -ne 0 ]]; then
         setopt PROMPT_SUBST
