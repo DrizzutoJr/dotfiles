@@ -82,7 +82,7 @@ git_status_check() {
         echo -n "*"
         return 0
     fi
-    if [[ -n "$(git log origin/$(git branch --show-current)..HEAD 2>/dev/null)" ]]; then
+    if git rev-parse --verify origin/$(git branch --show-current) &>/dev/null && [[ -n "$(git log origin/$(git branch --show-current)..HEAD 2>/dev/null)" ]]; then
         echo -n "!"
         return 0
     fi
