@@ -25,7 +25,7 @@ ps1() {
         fi
 
         if [[ "$param" == "k8s" ]]; then
-            ps1_string='%F{11}[$(kubectl config current-context 2>/dev/null || echo "-")|$(kubectl config view --minify --output "jsonpath={..namespace}" 2>/dev/null || echo "-")]%f '"$ps1_string"
+            ps1_string='%F{11}[$(kubectl config current-context 2>/dev/null || echo "-")|$(ns=$(kubectl config view --minify -o "jsonpath={..namespace}" 2>/dev/null); echo "${ns:-default}")]%f '"$ps1_string"
         fi
 
         if [[ "$param" == "date" ]]; then
@@ -241,7 +241,7 @@ badge() {
 
 ### VSCode + Tmux Auto-Split
 if [[ "$TERM_PROGRAM" == "vscode" ]] && [[ -z "$TMUX" ]]; then
-    exec tmux new-session \; split-window -h \; send-keys 'claude' Enter \; select-pane -L
+    exec tmux new-session \; send-keys 'ps1 git' Enter \; split-window -h \; send-keys 'claude' Enter \; select-pane -L
 fi
 
 

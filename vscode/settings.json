@@ -12,7 +12,9 @@
         "terminal.foreground": "#FFFFFF",
         "list.activeSelectionBackground": "#000000",
         "list.inactiveSelectionBackground": "#000000",
-        "list.inactiveSelectionForeground": "#ffffff"
+        "list.inactiveSelectionForeground": "#ffffff",
+        "editorWidget.background": "#1e1e1e",
+        "editorWidget.foreground": "#cccccc"
     },
     // Editor Behavior
     "editor.tabSize": 2,
