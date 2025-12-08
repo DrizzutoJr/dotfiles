@@ -1,7 +1,7 @@
 {
     // Appearance
     "workbench.colorTheme": "Drizzutojr Candyland",
-    "workbench.panel.defaultLocation": "bottom",
+    "workbench.panel.defaultLocation": "top",
     "workbench.sideBar.location": "left",
     "workbench.startupEditor": "none",
     "editor.minimap.enabled": false,

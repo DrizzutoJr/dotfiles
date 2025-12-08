@@ -243,7 +243,17 @@ badge() {
 
 ### VSCode + Tmux Auto-Split
 if [[ "$TERM_PROGRAM" == "vscode" ]] && [[ -z "$TMUX" ]]; then
-    exec tmux new-session \; send-keys 'ps1 git' Enter \; split-window -h \; send-keys 'claude' Enter \; select-pane -L
+    SESSION_NAME="vscode-$(basename "$PWD")"
+
+    if tmux has-session -t "$SESSION_NAME" 2>/dev/null; then
+        tmux attach-session -t "$SESSION_NAME"
+    else
+        tmux new-session -s "$SESSION_NAME" \; \
+            send-keys 'ps1 git' Enter \; \
+            split-window -h \; \
+            send-keys 'claude' Enter \; \
+            select-pane -L
+    fi
 fi
 
 
