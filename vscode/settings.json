@@ -57,5 +57,8 @@
         "**/build": true,
         "**/.git": true
     },
-    "workbench.preferredLightColorTheme": "Drizzutojr Candyland"
+    "workbench.preferredLightColorTheme": "Drizzutojr Candyland",
+    "workbench.externalBrowser": "/Applications/Firefox-Code.app",
+    "claudeCode.preferredLocation": "panel",
+    "claudeCode.useTerminal": true
 }
