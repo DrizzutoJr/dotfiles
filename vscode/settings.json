@@ -60,5 +60,7 @@
     "workbench.preferredLightColorTheme": "Drizzutojr Candyland",
     "workbench.externalBrowser": "/Applications/Firefox-Code.app",
     "claudeCode.preferredLocation": "panel",
-    "claudeCode.useTerminal": true
+    "claudeCode.useTerminal": true,
+    "terminal.integrated.initialHint": false,
+    "terminal.integrated.macOptionClickForcesSelection": true
 }
