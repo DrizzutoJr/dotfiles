@@ -1,7 +1,18 @@
 #!/bin/bash
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_DIR="$(dirname "$SCRIPT_DIR")"
+REPO_DIR="$SCRIPT_DIR"
+
+# Parse arguments
+NON_INTERACTIVE=false
+for arg in "$@"; do
+    case $arg in
+        --non-interactive)
+            NON_INTERACTIVE=true
+            shift
+            ;;
+    esac
+done
 
 # Helper function to create symlink with backup
 create_symlink() {
@@ -53,14 +64,24 @@ create_dir_symlink() {
 echo "=== macOS Dotfiles Setup ==="
 
 # Check if VS Code is running
-if pgrep -x "Code" > /dev/null; then
-    echo "! Error: Visual Studio Code is running. Please quit VS Code and try again." >&2
-    exit 1
-fi
-
+SKIP_VSCODE=false
 if [ "$(osascript -e 'application "Visual Studio Code" is running')" = "true" ]; then
-    echo "! Error: Visual Studio Code is running. Please quit VS Code and try again." >&2
-    exit 1
+    echo ""
+    echo "! Warning: Visual Studio Code is currently running."
+    if [[ "$NON_INTERACTIVE" == true ]]; then
+        echo "..Skipping VS Code setup (non-interactive mode)"
+        SKIP_VSCODE=true
+    else
+        read -p "Skip VS Code setup? (y/n): " -n 1 -r
+        echo ""
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+            echo "..Skipping VS Code setup"
+            SKIP_VSCODE=true
+        else
+            echo "! Please quit VS Code and run the script again." >&2
+            exit 1
+        fi
+    fi
 fi
 
 # Check if tmux is running
@@ -68,14 +89,19 @@ SKIP_TMUX=false
 if pgrep tmux > /dev/null; then
     echo ""
     echo "! Warning: tmux is currently running."
-    read -p "Kill tmux server and continue? (y/n): " -n 1 -r
-    echo ""
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
-        echo "..Killing tmux server"
-        tmux kill-server
-    else
-        echo "..Skipping tmux config setup"
+    if [[ "$NON_INTERACTIVE" == true ]]; then
+        echo "..Skipping tmux config setup (non-interactive mode)"
         SKIP_TMUX=true
+    else
+        read -p "Skip tmux setup? (y/n): " -n 1 -r
+        echo ""
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+            echo "..Skipping tmux config setup"
+            SKIP_TMUX=true
+        else
+            echo "! Please quit tmux and run the script again." >&2
+            exit 1
+        fi
     fi
 fi
 
@@ -130,43 +156,45 @@ create_symlink "$REPO_DIR/sublime/settings.json" "$SUBLIME_USER_DIR/Preferences.
 create_symlink "$REPO_DIR/sublime/CandyLand.tmTheme" "$SUBLIME_USER_DIR/CandyLand.tmTheme"
 
 # VS Code
-echo ""
-echo "Setting up VS Code"
-VSCODE_USER_DIR="$HOME/Library/Application Support/Code/User"
-VSCODE_EXTENSIONS_DIR="$REPO_DIR/vscode/extensions"
-VSCODE_EXTENSION_LIST="$VSCODE_EXTENSIONS_DIR/extension_list.yaml"
+if [[ "$SKIP_VSCODE" == false ]]; then
+    echo ""
+    echo "Setting up VS Code"
+    VSCODE_USER_DIR="$HOME/Library/Application Support/Code/User"
+    VSCODE_EXTENSIONS_DIR="$REPO_DIR/vscode/extensions"
+    VSCODE_EXTENSION_LIST="$VSCODE_EXTENSIONS_DIR/extension_list.yaml"
 
-if ! command -v code &> /dev/null; then
-    echo "! Warning: VS Code CLI not found. Skipping extension installation."
-    echo "..Run 'Shell Command: Install code command in PATH' from VS Code to enable."
-else
-    # Install local extensions (.vsix files)
-    echo "Installing local VS Code extensions"
-    for vsix_file in "$VSCODE_EXTENSIONS_DIR"/*/*.vsix; do
-        if [[ -f "$vsix_file" ]]; then
-            echo "..Installing extension: $(basename "$vsix_file")"
-            code --install-extension "$vsix_file"
-        fi
-    done
-
-    # Install extensions from extension_list.yaml
-    if [[ -f "$VSCODE_EXTENSION_LIST" ]]; then
-        echo "Installing VS Code extensions from list"
-        for extension in $(yq '.extensions[]' "$VSCODE_EXTENSION_LIST"); do
-            echo "..Installing extension: $extension"
-            code --install-extension "$extension"
+    if ! command -v code &> /dev/null; then
+        echo "! Warning: VS Code CLI not found. Skipping extension installation."
+        echo "..Run 'Shell Command: Install code command in PATH' from VS Code to enable."
+    else
+        # Install local extensions (.vsix files)
+        echo "Installing local VS Code extensions"
+        for vsix_file in "$VSCODE_EXTENSIONS_DIR"/*/*.vsix; do
+            if [[ -f "$vsix_file" ]]; then
+                echo "..Installing extension: $(basename "$vsix_file")"
+                code --install-extension "$vsix_file"
+            fi
         done
-    fi
-fi
 
-echo "Setting up VS Code config symlinks"
-create_symlink "$REPO_DIR/vscode/settings.json" "$VSCODE_USER_DIR/settings.json"
-create_symlink "$REPO_DIR/vscode/keybindings.json" "$VSCODE_USER_DIR/keybindings.json"
+        # Install extensions from extension_list.yaml
+        if [[ -f "$VSCODE_EXTENSION_LIST" ]]; then
+            echo "Installing VS Code extensions from list"
+            for extension in $(yq '.extensions[]' "$VSCODE_EXTENSION_LIST"); do
+                echo "..Installing extension: $extension"
+                code --install-extension "$extension"
+            done
+        fi
+    fi
+
+    echo "Setting up VS Code config symlinks"
+    create_symlink "$REPO_DIR/vscode/settings.json" "$VSCODE_USER_DIR/settings.json"
+    create_symlink "$REPO_DIR/vscode/keybindings.json" "$VSCODE_USER_DIR/keybindings.json"
+fi
 
 # Homebrew packages
 echo ""
 echo "Setting up Homebrew"
-BREW_PACKAGES_FILE_PATH="$SCRIPT_DIR/brew_packages.yaml"
+BREW_PACKAGES_FILE_PATH="$REPO_DIR/homebrew/brew_packages.yaml"
 
 if ! command -v brew &> /dev/null; then
     echo "! Error: brew not installed. Please install it first." >&2
