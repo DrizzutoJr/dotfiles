@@ -18,7 +18,8 @@ done
 create_symlink() {
     local source="$1"
     local target="$2"
-    local target_dir="$(dirname "$target")"
+    local target_dir
+    target_dir="$(dirname "$target")"
 
     # Create target directory if it doesn't exist
     if [[ ! -d "$target_dir" ]]; then

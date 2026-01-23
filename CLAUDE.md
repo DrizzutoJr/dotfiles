@@ -48,3 +48,8 @@ This is a dotfiles repository that manages configuration files via symlinks from
 ## Important Note
 
 The `claude_code/CLAUDE.md` file in this repo is **not** repo-specific guidance. It contains global Claude Code behavioral settings that get symlinked to `~/.claude/CLAUDE.md`. Do not modify it for repo-specific instructions - use this root `CLAUDE.md` instead.
+
+
+## Behaviours
+
+- Lint code after making changes to ensure changes pass
