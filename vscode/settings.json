@@ -63,5 +63,5 @@
     "claudeCode.useTerminal": true,
     "terminal.integrated.initialHint": false,
     "terminal.integrated.macOptionClickForcesSelection": true,
-    "window.title": "[${folderName}${separator}${remoteName}] - ${activeEditorShort}"
+    "window.title": "[${folderName}@${remoteName}] - ${activeEditorShort}"
 }
