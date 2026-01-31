@@ -13,6 +13,31 @@ echo -ne "\033[97m"
 
 autoload -Uz add-zsh-hook
 
+vsc() {
+  # Open VS Code in a new window
+  code -n "${1:-.}"
+
+  # Give VS Code time to launch and focus
+  sleep 0.5
+
+  osascript <<EOF
+tell application "System Events"
+  tell process "Code"
+    -- ⌃⌥⌘S
+    key code 1 using {control down, option down, command down}
+    delay 0.1
+
+    -- ⌃⌥⌘D
+    key code 2 using {control down, option down, command down}
+    delay 0.1
+
+    -- ⌃⌥↑
+    key code 126 using {control down, option down}
+  end tell
+end tell
+EOF
+}
+
 ps1() {
     # Using bright/bold 256-color codes for better visibility
     # 10=bright green, 12=bright blue, 13=bright magenta, 11=bright yellow, 9=bright red, 14=bright cyan, 15=bright white
