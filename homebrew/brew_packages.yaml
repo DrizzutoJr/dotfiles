@@ -5,3 +5,5 @@ packages:
 - openbao
 - opentofu
 - shellcheck
+- iterm2
+- orbstack
