@@ -9,6 +9,11 @@ Run the full macOS setup (creates symlinks, installs brew packages, installs VS 
 ./macos_setup.sh
 ```
 
+Run individual tool setup independently:
+```bash
+bash <tool>/macos_setup.sh [--non-interactive]
+```
+
 Prerequisites: Homebrew and yq must be installed.
 
 ## Architecture
@@ -32,7 +37,9 @@ This is a dotfiles repository that manages configuration files via symlinks from
 
 ### Key Files
 
-- `macos_setup.sh` - Main setup script with `create_symlink()` and `create_dir_symlink()` helper functions
+- `macos_setup.sh` - Root orchestrator that calls all sub-directory setup scripts
+- `_helpers/common.sh` - Shared functions (`create_symlink`, `create_dir_symlink`) and argument parsing
+- `<tool>/macos_setup.sh` - Per-directory setup scripts (independently runnable)
 - `homebrew/brew_packages.yaml` - Homebrew packages to install (parsed with yq)
 - `vscode/extensions/extension_list.yaml` - VS Code extensions to install from marketplace
 - `vscode/extensions/*/` - Local `.vsix` extension files
@@ -43,7 +50,8 @@ This is a dotfiles repository that manages configuration files via symlinks from
 ### Adding New Dotfiles
 
 1. Add the config file to the appropriate directory (or create a new one)
-2. Update `macos_setup.sh` to create the symlink using `create_symlink` or `create_dir_symlink`
+2. Create a `macos_setup.sh` in the directory that sources `_helpers/common.sh` and uses `create_symlink` or `create_dir_symlink`
+3. Add the new sub-script call to the root `macos_setup.sh` orchestrator
 
 ## Important Note
 

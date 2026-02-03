@@ -1,7 +1,8 @@
 packages:
-- yq
-- bentobox
-- tmux
-- openbao
-- opentofu
-- shellcheck
+  - yq
+  - bentobox
+  - tmux
+  - openbao
+  - opentofu
+  - shellcheck
+  - iterm2
