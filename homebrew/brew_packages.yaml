@@ -1,9 +1,12 @@
 packages:
-- yq
-- bentobox
-- tmux
-- openbao
-- opentofu
-- shellcheck
-- iterm2
-- orbstack
+  - yq
+  - tmux
+  - openbao
+  - opentofu
+  - shellcheck
+
+casks:
+  - iterm2
+  - orbstack
+  - bentobox
+  - rectangle
