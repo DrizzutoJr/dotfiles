@@ -12,12 +12,19 @@ if ! command -v brew &> /dev/null; then
     exit 1
 fi
 
-if [[ -f "$BREW_PACKAGES_FILE_PATH" ]]; then
-    echo "Installing homebrew packages"
-    for package in $(yq '.packages[]' "$BREW_PACKAGES_FILE_PATH"); do
-        echo "..Installing brew package: $package"
-        brew install "$package"
-    done
-else
+if [[ ! -f "$BREW_PACKAGES_FILE_PATH" ]]; then
     echo "..No brew_packages.yaml found, skipping"
+    exit 0
 fi
+
+echo "Installing homebrew packages"
+for package in $(yq '.packages[]' "$BREW_PACKAGES_FILE_PATH"); do
+    echo "..Installing brew package: $package"
+    brew install "$package"
+done
+
+echo "Installing homebrew casks"
+for cask in $(yq '.casks[]' "$BREW_PACKAGES_FILE_PATH"); do
+    echo "..Installing brew cask: $cask"
+    brew install --cask "$cask"
+done
