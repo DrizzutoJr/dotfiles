@@ -10,3 +10,8 @@ casks:
   - orbstack
   - bentobox
   - rectangle
+  - "logi-options+"
+  - visual-studio-code
+  - claude
+  - claude-code
+  - alt-tab
