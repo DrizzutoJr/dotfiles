@@ -12,6 +12,11 @@ if ! command -v brew &> /dev/null; then
     exit 1
 fi
 
+if ! command -v yq &> /dev/null; then
+    echo "..yq not found, installing via brew"
+    brew install yq
+fi
+
 if [[ ! -f "$BREW_PACKAGES_FILE_PATH" ]]; then
     echo "..No brew_packages.yaml found, skipping"
     exit 0
