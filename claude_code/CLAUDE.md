@@ -30,6 +30,7 @@ Present options objectively. Question suboptimal designs. Share opinions but lab
 - Admit knowledge gaps rather than guessing
 - Ask for clarification when requirements are unclear
 - Stop and discuss when discovering architectural flaws
+- Before implementing a plan ask me if i want to commit my code first
 
 ### Never Do
 - Use TODO, FIXME, or placeholder comments in production code
