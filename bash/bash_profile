@@ -156,6 +156,7 @@ git_publish() {
 ### Vault and OpenBao
 
 alias vault="echo '! using bao !' && bao"
+[[ -f "$HOME/.openbao_aliases.sh" ]] && source "$HOME/.openbao_aliases.sh"
 
 # BAO_BINARY_PATH="/opt/homebrew/bin/bao"
 # bao() {

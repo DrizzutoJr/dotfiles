@@ -62,6 +62,10 @@ ps1() {
             prefix+='%F{14}%m%f '
         fi
 
+        if [[ "$param" == "bao" ]]; then
+            prefix+='%F{208}[${BAO_INSTANCE:--}]%f '
+        fi
+
         if [[ "$param" == "venv" ]]; then
             prefix+='%(1V.%F{15}(%1v)%f .)'
             precmd_funcs+=(_update_venv)
@@ -80,7 +84,7 @@ ps1() {
             done
         fi
     else
-        echo "git, k8s, date, host, venv"
+        echo "git, k8s, date, host, bao, venv"
     fi
 }
 
@@ -205,6 +209,7 @@ alias k-prod='export KUBECONFIG=~/.kube/prod.k8s.homelab-config; kubectl'
 ### Vault and OpenBao
 
 alias vault="echo '! using bao !' && bao"
+[[ -f "$HOME/.openbao_aliases.sh" ]] && source "$HOME/.openbao_aliases.sh"
 
 
 ### Terraform
