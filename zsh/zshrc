@@ -293,7 +293,8 @@ badge() {
 
 
 ### VSCode + Tmux Auto-Split
-if [[ "$TERM_PROGRAM" == "vscode" ]] && [[ -z "$TMUX" ]]; then
+if [[ "$TERM_PROGRAM" == "vscode" ]]; then
+    unset TMUX TMUX_PANE
     SESSION_NAME="vscode-$(basename "$PWD")"
 
     if tmux has-session -t "$SESSION_NAME" 2>/dev/null; then
