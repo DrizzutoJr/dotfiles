@@ -200,10 +200,31 @@ git_publish() {
 
 ### Kubernetes
 
+K8S_CONFIGS="$HOME/.kube/configs"
 alias k='kubectl'
 alias k-setns='kubectl config set-context --current --namespace'
-alias k-dev='export KUBECONFIG=~/.kube/dev.k8s.homelab-config; kubectl'
-alias k-prod='export KUBECONFIG=~/.kube/prod.k8s.homelab-config; kubectl'
+k-setcontext() {
+    local configs=("$K8S_CONFIGS"/*.yaml(N))
+    if (( ${#configs[@]} == 0 )); then
+        echo "No kubeconfig files found in $K8S_CONFIGS" >&2
+        return 1
+    fi
+    local names=()
+    local c
+    for c in "${configs[@]}"; do names+=("$(basename "$c")"); done
+    local PS3="Select kubeconfig: "
+    local choice
+    select choice in "${names[@]}"; do
+        if [[ -n "$choice" ]]; then
+            export KUBECONFIG="$K8S_CONFIGS/$choice"
+            echo "KUBECONFIG=$KUBECONFIG"
+            break
+        fi
+    done
+}
+k-orb()  { export KUBECONFIG="$K8S_CONFIGS/orbstack.yaml";  kubectl "$@"; }
+k-dev()  { export KUBECONFIG="$K8S_CONFIGS/dev.yaml";  kubectl "$@"; }
+k-prod() { export KUBECONFIG="$K8S_CONFIGS/prod.yaml"; kubectl "$@"; }
 
 
 ### Vault and OpenBao
