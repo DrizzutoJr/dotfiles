@@ -4,6 +4,7 @@ packages:
   - openbao
   - opentofu
   - shellcheck
+  - argocd
 
 casks:
   - iterm2
