@@ -50,7 +50,7 @@
     },
     "docker.extension.enableComposeLanguageServer": false,
     // Performance
-    "extensions.autoUpdate": true,
+    "extensions.autoUpdate": "on",
     "search.exclude": {
         "**/node_modules": true,
         "**/dist": true,
@@ -63,5 +63,9 @@
     "claudeCode.useTerminal": true,
     "terminal.integrated.initialHint": false,
     "terminal.integrated.macOptionClickForcesSelection": true,
-    "window.title": "[${folderName}@${remoteName}] - ${activeEditorShort}"
+    "window.title": "[${folderName}@${remoteName}] - ${activeEditorShort}",
+    "files.associations": {
+        "*.tfvars": "hcl"
+    },
+    "chat.disableAIFeatures": true
 }
