@@ -8,5 +8,55 @@
     "key": "Cmd+Ctrl+O",
     "command": "workbench.action.focusActiveEditorGroup",
     "when": "terminalFocus"
+  },
+  {
+    "key": "Ctrl+Alt+0",
+    "command": "workbench.action.tasks.runTask",
+    "args": "Ctrl Opt 0"
+  },
+  {
+    "key": "Ctrl+Alt+1",
+    "command": "workbench.action.tasks.runTask",
+    "args": "Ctrl Opt 1"
+  },
+  {
+    "key": "Ctrl+Alt+2",
+    "command": "workbench.action.tasks.runTask",
+    "args": "Ctrl Opt 2"
+  },
+  {
+    "key": "Ctrl+Alt+3",
+    "command": "workbench.action.tasks.runTask",
+    "args": "Ctrl Opt 3"
+  },
+  {
+    "key": "Ctrl+Alt+4",
+    "command": "workbench.action.tasks.runTask",
+    "args": "Ctrl Opt 4"
+  },
+  {
+    "key": "Ctrl+Alt+5",
+    "command": "workbench.action.tasks.runTask",
+    "args": "Ctrl Opt 5"
+  },
+  {
+    "key": "Ctrl+Alt+6",
+    "command": "workbench.action.tasks.runTask",
+    "args": "Ctrl Opt 6"
+  },
+  {
+    "key": "Ctrl+Alt+7",
+    "command": "workbench.action.tasks.runTask",
+    "args": "Ctrl Opt 7"
+  },
+  {
+    "key": "Ctrl+Alt+8",
+    "command": "workbench.action.tasks.runTask",
+    "args": "Ctrl Opt 8"
+  },
+  {
+    "key": "Ctrl+Alt+9",
+    "command": "workbench.action.tasks.runTask",
+    "args": "Ctrl Opt 9"
   }
 ]
