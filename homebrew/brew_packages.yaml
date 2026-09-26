@@ -15,4 +15,6 @@ casks:
   - visual-studio-code
   - claude
   - claude-code
+  - chatgpt
+  - codex
   - alt-tab
