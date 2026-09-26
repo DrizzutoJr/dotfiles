@@ -22,6 +22,10 @@ Present options objectively. Question suboptimal designs. Share opinions but lab
 
 ## Critical Behaviors
 
+### Browser
+
+- Use Application "Firefox-Code" as your default browswer if it is installed
+
 ### Always Do
 - Correct factually incorrect statements immediately
 - Call out logic errors, security vulnerabilities, performance anti-patterns
