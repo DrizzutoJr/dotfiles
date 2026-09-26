@@ -1,0 +1,21 @@
+emulate -L zsh
+
+local prefix="$1"
+
+if [[ -z "$prefix" ]]; then
+  echo "_tmux_session_name: prefix required" >&2
+  return 1
+fi
+
+local directory="${PWD:A}"
+local dir_name="${directory:t}"
+dir_name=${dir_name//[^[:alnum:]_-]/_}
+if [[ -z "$dir_name" ]]; then
+  dir_name="root"
+fi
+
+local checksum
+checksum=$(printf '%s' "$directory" | cksum) || return 1
+checksum=${checksum%% *}
+
+print -r -- "${prefix}-${dir_name}-${checksum}"

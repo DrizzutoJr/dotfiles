@@ -1,0 +1,28 @@
+emulate -L zsh
+
+if ! command -v tmux &> /dev/null; then
+  echo "tmux not found" >&2
+  return 1
+fi
+
+local session_name
+session_name="$(_tmux_session_name code)" || return 1
+
+local left_pane right_pane announce
+if ! tmux has-session -t "=${session_name}" 2>/dev/null; then
+  left_pane="$(tmux new-session -d -s "$session_name" -c "$PWD" -P -F '#{pane_id}')" || return 1
+  if ! right_pane="$(tmux split-window -h -t "$left_pane" -c "$PWD" -P -F '#{pane_id}')"; then
+    tmux kill-session -t "=${session_name}" >/dev/null 2>&1
+    return 1
+  fi
+
+  announce="!!! New session ${session_name} started !!!"
+  if ! tmux send-keys -t "$left_pane" "echo ${(qq)announce}; ps1 git" Enter ||
+     ! tmux send-keys -t "$right_pane" 'ps1 git' Enter ||
+     ! tmux select-pane -t "$left_pane"; then
+    tmux kill-session -t "=${session_name}" >/dev/null 2>&1
+    return 1
+  fi
+fi
+
+_tmux_goto_session "$session_name"

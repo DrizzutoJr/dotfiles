@@ -3,6 +3,11 @@
 export CLICOLOR=1
 export LSCOLORS=gxbxdxexfxabacadaeafag
 
+# An inherited FPATH can replace zsh's standard autoload directories.
+if [[ -d "/usr/share/zsh/${ZSH_VERSION}/functions" ]]; then
+  fpath=("/usr/share/zsh/${ZSH_VERSION}/functions" $fpath)
+fi
+
 # Use bright white for default text (helps with VS Code terminal appearing grey)
 export TERM="xterm-256color"
 autoload -U colors && colors
@@ -12,6 +17,12 @@ echo -ne "\033[97m"
 ### Generic Config
 
 autoload -Uz add-zsh-hook
+
+# Resolve the sourced file so the functions load through the ~/.zshrc symlink.
+fpath=("${${(%):-%x}:A:h}/functions" $fpath)
+autoload -Uz _tmux_session_name _tmux_goto_session
+autoload -Uz tmux-dir tmux-code
+
 
 vsc() {
   # Open VS Code in a new window
@@ -47,7 +58,7 @@ ps1() {
     local prefix=""
     for param in "$@"; do
         if [[ "$param" == "git" ]]; then
-            prefix+='%F{13}[$(git-branch-name 2>/dev/null || echo "-")|$(git_status_check 2>/dev/null || echo "-")]%f '
+            prefix+='%F{13}[%B$(git_repo_name 2>/dev/null || printf -- "-")%b|$(git-branch-name 2>/dev/null || printf -- "-")|$(git_status_check 2>/dev/null || printf -- "-")]%f '
         fi
 
         if [[ "$param" == "k8s" ]]; then
@@ -107,6 +118,12 @@ export PATH="/opt/homebrew/opt/ruby/bin:$PATH"
 
 alias git-branch-name='git rev-parse --abbrev-ref HEAD'
 alias git-publish-nolint='git push origin $(git-branch-name)'
+
+git_repo_name() {
+    local repo_root
+    repo_root=$(git rev-parse --show-toplevel 2>/dev/null) || return 1
+    printf "%s" "${repo_root:t}"
+}
 
 git_status_check() {
     if [[ -n "$(git status --porcelain 2>/dev/null)" ]]; then
@@ -253,7 +270,6 @@ developer() {
     if [[ "$1" == "-" ]]; then
         echo "Changing to Developer Directory"
         cd /Users/drizzutojr/Developer || return
-        open -g -a "Visual Studio Code" .
     fi
 }
 
@@ -290,23 +306,6 @@ badge() {
     local badgeMessage="$1"
     echo -ne "\033]1337;SetBadgeFormat=$(echo -n "$badgeMessage" | base64)\a"
 }
-
-
-### VSCode + Tmux Auto-Split
-if [[ "$TERM_PROGRAM" == "vscode" ]]; then
-    unset TMUX TMUX_PANE
-    SESSION_NAME="vscode-$(basename "$PWD")"
-
-    if tmux has-session -t "$SESSION_NAME" 2>/dev/null; then
-        tmux attach-session -t "$SESSION_NAME"
-    else
-        tmux new-session -s "$SESSION_NAME" \; \
-            send-keys 'ps1 git' Enter \; \
-            split-window -h \; \
-            send-keys 'claude' Enter \; \
-            select-pane -L
-    fi
-fi
 
 
 ### Setup
