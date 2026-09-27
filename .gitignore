@@ -11,6 +11,9 @@ dist/
 .env
 .venv/
 
+# Claude Code skill sync cache (written into the symlinked skills dir)
+claude_code/skills/synced/
+
 # Compiled Java class files
 *.class
 
