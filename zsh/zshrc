@@ -257,9 +257,9 @@ alias terraform="echo '! using tofu !' && tofu"
 
 ### Home Laptop
 
-alias cd-developer='cd /Users/drizzutojr/Developer'
-alias cd-homelab='cd /Users/drizzutojr/Developer/Projects/HomeLab'
-alias cd-dotfiles='cd /Users/drizzutojr/Developer/Projects/dotfiles'
+alias cd-developer='cd "$HOME/Developer"'
+alias cd-homelab='cd "$HOME/Developer/Projects/HomeLab"'
+alias cd-dotfiles='cd "$HOME/Developer/Projects/dotfiles"'
 
 
 ### Developer
@@ -269,7 +269,7 @@ developer() {
     ps1 git k8s host
     if [[ "$1" == "-" ]]; then
         echo "Changing to Developer Directory"
-        cd /Users/drizzutojr/Developer || return
+        cd "$HOME/Developer" || return
     fi
 }
 
@@ -281,7 +281,7 @@ homelab() {
     ps1 git k8s host
     if [[ "$1" == "-" ]]; then
         echo "Changing to HomeLab Directory"
-        cd /Users/drizzutojr/Developer/Projects/HomeLab || return
+        cd "$HOME/Developer/Projects/HomeLab" || return
         open -g -a "Visual Studio Code" .
     fi
 }
@@ -294,7 +294,7 @@ dotfiles() {
     ps1 git k8s host
     if [[ "$1" == "-" ]]; then
         echo "Changing to Dotfiles Directory"
-        cd /Users/drizzutojr/Developer/Projects/dotfiles || return
+        cd "$HOME/Developer/Projects/dotfiles" || return
         open -g -a "Visual Studio Code" .
     fi
 }
