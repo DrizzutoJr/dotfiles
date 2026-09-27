@@ -47,7 +47,7 @@ else
         echo "Installing VS Code extensions from list"
         for extension in $(yq '.extensions[]' "$VSCODE_EXTENSION_LIST"); do
             echo "..Installing extension: $extension"
-            code --install-extension "$extension"
+            code --install-extension "$extension" --force
         done
     fi
 fi
