@@ -12,7 +12,7 @@ local pane announce
 
 if ! tmux has-session -t "=${session_name}" 2>/dev/null; then
   pane="$(tmux new-session -d -s "$session_name" -c "$PWD" -P -F '#{pane_id}')" || return 1
-  announce="!!! New session ${session_name} started !!!"
+  announce="!!! New session ${session_name} started at $(date '+%Y-%m-%d %H:%M:%S') !!!"
   if ! tmux send-keys -t "$pane" "echo ${(qq)announce}" Enter; then
     tmux kill-session -t "=${session_name}" >/dev/null 2>&1
     return 1

@@ -16,7 +16,7 @@ if ! tmux has-session -t "=${session_name}" 2>/dev/null; then
     return 1
   fi
 
-  announce="!!! New session ${session_name} started !!!"
+  announce="!!! New session ${session_name} started at $(date '+%Y-%m-%d %H:%M:%S') !!!"
   if ! tmux send-keys -t "$left_pane" "echo ${(qq)announce}; ps1 git" Enter ||
      ! tmux send-keys -t "$right_pane" 'ps1 git' Enter ||
      ! tmux select-pane -t "$left_pane"; then
