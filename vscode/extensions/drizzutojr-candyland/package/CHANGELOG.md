@@ -1,5 +1,22 @@
 # Change Log
 
+## [0.1.3]
+
+### Added
+
+- Panel chrome: `panel.background` is `#929292` with a black active tab and
+  white label, matching the reference layout. The panel previously had no
+  colors of its own and fell back to the light base.
+- Panel title tabs use `modernTab.*` while editor tabs use
+  `modernEditorTab.*`, which only defaults from it. Both are now set
+  independently, so the panel gets a black active tab while editor tabs keep
+  the cream one from 0.1.1.
+
+### Changed
+
+- `panelTitle.inactiveForeground` is `#1A1A1A` rather than the `#565656`
+  default, which scored 2.36:1 on `#929292`. Now 5.59:1.
+
 ## [0.1.2]
 
 ### Changed
