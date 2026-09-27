@@ -20,7 +20,7 @@ autoload -Uz add-zsh-hook
 
 # Resolve the sourced file so the functions load through the ~/.zshrc symlink.
 fpath=("${${(%):-%x}:A:h}/functions" $fpath)
-autoload -Uz _tmux_session_name _tmux_goto_session
+autoload -Uz _tmux_session_name _tmux_goto_session _tmux_reset_session
 autoload -Uz tmux-dir tmux-code
 
 
