@@ -1,5 +1,19 @@
 # Change Log
 
+## [0.1.1]
+
+### Fixed
+
+- The active editor tab rendered its label in white on the cream tab
+  background, about 1.03:1. VS Code's modern tab bar defaults
+  `modernTab.activeForeground` to `list.inactiveSelectionForeground`, and
+  `tab.selectedBackground`, `modernTab.activeBackground` and
+  `notebook.selectedCellBackground` to `list.inactiveSelectionBackground`.
+  This theme sets those two to `#FFFFFF` and `#000000` for the explorer, so
+  the explorer's selection styling leaked into the tab bar. Every tab surface
+  is now pinned explicitly, along with breadcrumbs and the notebook cell
+  background that shared the same derivation.
+
 ## [0.1.0]
 
 Correctness and readability pass over the original Sublime Text port.
