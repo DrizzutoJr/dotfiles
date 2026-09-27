@@ -1,6 +1,6 @@
-# CLAUDE.md
+# AGENTS.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to coding agents when working with code in this repository.
 
 ## Setup Command
 
@@ -74,7 +74,7 @@ existing config by delegating to `zsh -c` to dump `DOTFILES_CONFIG` as tab-separ
 
 ## Important Note
 
-The `claude_code/CLAUDE.md` file in this repo is **not** repo-specific guidance. It contains global Claude Code behavioral settings that get symlinked to `~/.claude/CLAUDE.md`. Do not modify it for repo-specific instructions - use this root `CLAUDE.md` instead.
+The `claude_code/CLAUDE.md` file in this repo is **not** repo-specific guidance. It contains global Claude Code behavioral settings that get symlinked to `~/.claude/CLAUDE.md`. Do not modify it for repo-specific instructions - use this root `AGENTS.md` instead.
 
 
 ## Behaviours
