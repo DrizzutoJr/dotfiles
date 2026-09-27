@@ -5,6 +5,7 @@ packages:
   - opentofu
   - shellcheck
   - argocd
+  - vsce
 
 casks:
   - iterm2

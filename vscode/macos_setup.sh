@@ -33,12 +33,15 @@ if ! command -v code &> /dev/null; then
     echo "! Warning: VS Code CLI not found. Skipping extension installation."
     echo "..Run 'Shell Command: Install code command in PATH' from VS Code to enable."
 else
-    # Install local extensions (.vsix files)
+    # Install local extensions. Packaging a .vsix is a manual step; this only
+    # installs the highest-versioned one present in each extension directory.
     echo "Installing local VS Code extensions"
-    for vsix_file in "$VSCODE_EXTENSIONS_DIR"/*/*.vsix; do
-        if [[ -f "$vsix_file" ]]; then
+    for ext_dir in "$VSCODE_EXTENSIONS_DIR"/*/; do
+        [[ -d "$ext_dir" ]] || continue
+        vsix_file=$(find "$ext_dir" -maxdepth 1 -name '*.vsix' 2>/dev/null | sort -V | tail -1)
+        if [[ -n "$vsix_file" ]]; then
             echo "..Installing extension: $(basename "$vsix_file")"
-            code --install-extension "$vsix_file"
+            code --install-extension "$vsix_file" --force
         fi
     done
 
