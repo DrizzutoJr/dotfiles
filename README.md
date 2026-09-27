@@ -69,7 +69,7 @@ being replaced.
 | `vscode/`, `sublime/` | Editor settings, keybindings, themes, extensions |
 | `openbao/aliases-homelab.sh` | openbao login helpers |
 
-See `CLAUDE.md` for the full symlink mapping and more detail on how per-machine values
+See `AGENTS.md` for the full symlink mapping and more detail on how per-machine values
 work.
 
 ## Adding a new dotfile
