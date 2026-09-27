@@ -291,14 +291,16 @@ alias terraform="echo '! using tofu !' && tofu"
 ### Developer
 
 developer() {
+    local dir
+    dir="$(host_config developer_root)" || return
+    if [[ ! -d "$dir" ]]; then
+        echo "!!! Developer Dir $dir not found !!!"
+        return 1
+    fi
+    cd "$dir" || return
+    echo "Changed to Dir $dir"
     badge "Developer"
     ps1 git k8s host
-    if [[ "$1" == "-" ]]; then
-        local dir
-        dir="$(host_config developer_root)" || return
-        cd "$dir" || return
-        echo "Switched to $dir"
-    fi
 }
 
 
