@@ -1,5 +1,17 @@
 # Change Log
 
+## [0.1.4]
+
+### Fixed
+
+- Unselected terminal-tab labels scored 1.99:1 on the #929292 panel. They
+  take the global `foreground` (VS Code registers no `list.foreground`),
+  whose light default is #616161. Set to #1A1A1A, giving 5.59:1.
+  Dark surfaces are unaffected: each sets its own foreground, which
+  cascades to the rows inside it.
+- `list.hoverBackground` and `list.hoverForeground` pinned, so hover on the
+  gray panel no longer falls back to the light default.
+
 ## [0.1.3]
 
 ### Added
