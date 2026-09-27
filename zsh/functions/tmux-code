@@ -5,24 +5,45 @@ if ! command -v tmux &> /dev/null; then
   return 1
 fi
 
+local reset=0
+local arg
+for arg in "$@"; do
+  case "$arg" in
+    -n|--new) reset=1 ;;
+    *)
+      echo "tmux-code: unknown option: $arg" >&2
+      return 1
+      ;;
+  esac
+done
+
 local session_name
 session_name="$(_tmux_session_name code)" || return 1
+
+local stashed=""
+if (( reset )); then
+  stashed="$(_tmux_reset_session "$session_name")" || return 1
+fi
 
 local left_pane right_pane announce
 if ! tmux has-session -t "=${session_name}" 2>/dev/null; then
   left_pane="$(tmux new-session -d -s "$session_name" -c "$PWD" -P -F '#{pane_id}')" || return 1
-  if ! right_pane="$(tmux split-window -h -t "$left_pane" -c "$PWD" -P -F '#{pane_id}')"; then
-    tmux kill-session -t "=${session_name}" >/dev/null 2>&1
-    return 1
-  fi
-
   announce="!!! New session ${session_name} started at $(date '+%Y-%m-%d %H:%M:%S') !!!"
-  if ! tmux send-keys -t "$left_pane" "echo ${(qq)announce}; ps1 git" Enter ||
+
+  if ! right_pane="$(tmux split-window -h -t "$left_pane" -c "$PWD" -P -F '#{pane_id}')" ||
+     ! tmux send-keys -t "$left_pane" "echo ${(qq)announce}; ps1 git" Enter ||
      ! tmux send-keys -t "$right_pane" 'ps1 git' Enter ||
      ! tmux select-pane -t "$left_pane"; then
     tmux kill-session -t "=${session_name}" >/dev/null 2>&1
+    if [[ -n "$stashed" ]]; then
+      tmux rename-session -t "=${stashed}" "$session_name" >/dev/null 2>&1
+    fi
     return 1
   fi
 fi
 
-_tmux_goto_session "$session_name"
+_tmux_goto_session "$session_name" || return 1
+
+if [[ -n "$stashed" ]]; then
+  tmux kill-session -t "=${stashed}" >/dev/null 2>&1
+fi
