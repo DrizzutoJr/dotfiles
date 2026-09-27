@@ -59,7 +59,7 @@
 		"tab.selectedForeground": "#6B1767",
 		"tab.unfocusedActiveForeground": "#7A6B76",
 		"tab.unfocusedInactiveForeground": "#9A8D95",
-		"terminal.background": "#1E1E1E",
+		"terminal.background": "#000000",
 		"terminal.foreground": "#FFFFFF",
 		"terminalCursor.foreground": "#FFFFFF"
 	},

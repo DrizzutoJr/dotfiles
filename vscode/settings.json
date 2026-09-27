@@ -28,6 +28,9 @@
     "terminal.integrated.fontSize": 12,
     "terminal.integrated.cursorBlinking": true,
     "terminal.integrated.defaultProfile.osx": "zsh",
+    "terminal.integrated.altClickMovesCursor": false,
+    "terminal.integrated.tabs.location": "left",
+    "terminal.integrated.tabs.description": "",
     // Git
     "git.openRepositoryInParentFolders": "never",
     "git.autofetch": true,

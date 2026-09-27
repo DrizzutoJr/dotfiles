@@ -1,5 +1,14 @@
 # Change Log
 
+## [0.1.2]
+
+### Changed
+
+- `terminal.background` is now `#000000` rather than `#1E1E1E`, matching
+  the value carried over from another machine. The `#1E1E1E` in 0.1.0 was
+  a guess made to give the existing white `terminal.foreground` an
+  explicit background.
+
 ## [0.1.1]
 
 ### Fixed
