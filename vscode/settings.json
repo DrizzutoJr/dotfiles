@@ -8,14 +8,6 @@
     "editor.fontSize": 12,
     "editor.lineHeight": 1.6,
     "workbench.tree.indent": 16,
-    "workbench.colorCustomizations": {
-        "terminal.foreground": "#FFFFFF",
-        "list.activeSelectionBackground": "#000000",
-        "list.inactiveSelectionBackground": "#000000",
-        "list.inactiveSelectionForeground": "#ffffff",
-        "editorWidget.background": "#1e1e1e",
-        "editorWidget.foreground": "#cccccc"
-    },
     // Editor Behavior
     "editor.tabSize": 2,
     "editor.insertSpaces": true,
@@ -57,7 +49,6 @@
         "**/build": true,
         "**/.git": true
     },
-    "workbench.preferredLightColorTheme": "Drizzutojr Candyland",
     "workbench.externalBrowser": "/Applications/Firefox-Code.app",
     "claudeCode.preferredLocation": "panel",
     "claudeCode.useTerminal": true,
