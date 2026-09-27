@@ -15,6 +15,7 @@ done
 echo "=== macOS Dotfiles Setup ==="
 
 # Run each sub-script in order
+bash "$SCRIPT_DIR/hosts/macos_setup.sh" "${ARGS[@]}" || exit 1
 bash "$SCRIPT_DIR/zsh/macos_setup.sh" "${ARGS[@]}" || exit 1
 bash "$SCRIPT_DIR/bash/macos_setup.sh" "${ARGS[@]}" || exit 1
 bash "$SCRIPT_DIR/homebrew/macos_setup.sh" "${ARGS[@]}" || exit 1

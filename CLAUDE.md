@@ -40,6 +40,7 @@ This is a dotfiles repository that manages configuration files via symlinks from
 - `macos_setup.sh` - Root orchestrator that calls all sub-directory setup scripts
 - `_helpers/common.sh` - Shared functions (`create_symlink`, `create_dir_symlink`) and argument parsing
 - `<tool>/macos_setup.sh` - Per-directory setup scripts (independently runnable)
+- `hosts/macos_setup.sh` - Prompts for per-machine values and writes `~/.dotfiles-config`
 - `homebrew/brew_packages.yaml` - Homebrew packages to install (parsed with yq)
 - `vscode/extensions/extension_list.yaml` - VS Code extensions to install from marketplace
 - `vscode/extensions/*/` - Local `.vsix` extension files
@@ -52,6 +53,24 @@ This is a dotfiles repository that manages configuration files via symlinks from
 1. Add the config file to the appropriate directory (or create a new one)
 2. Create a `macos_setup.sh` in the directory that sources `_helpers/common.sh` and uses `create_symlink` or `create_dir_symlink`
 3. Add the new sub-script call to the root `macos_setup.sh` orchestrator
+
+### Per-Machine Values
+
+Values that differ between machines (developer root, brew prefix, username, openbao CA
+cert path) are never derived or looked up in a committed table — a machine only ever needs
+its own values, and directory names differ enough between machines that no derivation
+scheme would get them right.
+
+`hosts/macos_setup.sh` runs first in the orchestrator. On first run it prompts for each
+value and writes them to `~/.dotfiles-config`, outside the repo and never committed. On
+later runs it shows the current values and asks whether to keep them or change them.
+`dotfiles_root` is never typed — it is always the clone the script is running from.
+`zsh/zshrc` sources `~/.dotfiles-config` (a `DOTFILES_CONFIG` associative array) before its
+Homebrew block, which consumes `brew_prefix`. Read values with the `host_config <key>`
+helper, which fails loudly on a missing array or missing key rather than returning empty.
+
+Since `/bin/bash` on macOS has no associative arrays, `hosts/macos_setup.sh` reads an
+existing config by delegating to `zsh -c` to dump `DOTFILES_CONFIG` as tab-separated pairs.
 
 ## Important Note
 

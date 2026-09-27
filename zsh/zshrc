@@ -24,6 +24,31 @@ autoload -Uz _tmux_session_name _tmux_goto_session
 autoload -Uz tmux-dir tmux-code
 
 
+### Host Config
+
+# Per-machine values, generated into ~/.dotfiles-config by hosts/macos_setup.sh.
+# Sourced before Homebrew below, which consumes DOTFILES_CONFIG[brew_prefix].
+if [[ -r "$HOME/.dotfiles-config" ]]; then
+  source "$HOME/.dotfiles-config"
+else
+  print -u2 "! No ~/.dotfiles-config. Run macos_setup.sh from the dotfiles repo."
+fi
+
+# Read a host config value, or explain what is missing and fail.
+host_config() {
+  local key="$1"
+  if (( ! ${+DOTFILES_CONFIG} )); then
+    print -u2 "! No host config loaded. Run macos_setup.sh from the dotfiles repo."
+    return 1
+  fi
+  if [[ -z "${DOTFILES_CONFIG[$key]}" ]]; then
+    print -u2 "! Host config has no '$key'. Re-run macos_setup.sh to set it."
+    return 1
+  fi
+  print -r -- "${DOTFILES_CONFIG[$key]}"
+}
+
+
 vsc() {
   # Open VS Code in a new window
   code -n "${1:-.}"
@@ -110,8 +135,16 @@ _update_venv() {
 
 ### Homebrew
 
-eval "$(/opt/homebrew/bin/brew shellenv)"
-export PATH="/opt/homebrew/opt/ruby/bin:$PATH"
+# Not host_config: if the host config is missing, brew still has to come up, or
+# there is no way to run the setup that would fix it. Bootstrap escape hatch, not a default.
+_brew_prefix="${DOTFILES_CONFIG[brew_prefix]:-/opt/homebrew}"
+if [[ -x "$_brew_prefix/bin/brew" ]]; then
+  eval "$("$_brew_prefix/bin/brew" shellenv)"
+  export PATH="$_brew_prefix/opt/ruby/bin:$PATH"
+else
+  print -u2 "! No brew at $_brew_prefix. Re-run macos_setup.sh to fix brew_prefix."
+fi
+unset _brew_prefix
 
 
 ### Git and Linting
@@ -255,48 +288,16 @@ alias vault="echo '! using bao !' && bao"
 alias terraform="echo '! using tofu !' && tofu"
 
 
-### Home Laptop
-
-alias cd-homelab='cd "$HOME/Developer/Projects/HomeLab"'
-alias cd-dotfiles='cd "$HOME/Developer/Projects/dotfiles"'
-
-
 ### Developer
 
 developer() {
     badge "Developer"
     ps1 git k8s host
     if [[ "$1" == "-" ]]; then
-        local dir="/Volumes/drizzutojr/Developer"
-        [[ -d "$dir" ]] || dir="$HOME/Developer"
+        local dir
+        dir="$(host_config developer_root)" || return
         cd "$dir" || return
         echo "Switched to $dir"
-    fi
-}
-
-
-### HomeLab
-
-homelab() {
-    badge "HomeLab"
-    ps1 git k8s host
-    if [[ "$1" == "-" ]]; then
-        echo "Changing to HomeLab Directory"
-        cd "$HOME/Developer/Projects/HomeLab" || return
-        open -g -a "Visual Studio Code" .
-    fi
-}
-
-
-### Dotfiles
-
-dotfiles() {
-    badge "Dotfiles"
-    ps1 git k8s host
-    if [[ "$1" == "-" ]]; then
-        echo "Changing to Dotfiles Directory"
-        cd "$HOME/Developer/Projects/dotfiles" || return
-        open -g -a "Visual Studio Code" .
     fi
 }
 

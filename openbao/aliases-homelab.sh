@@ -3,11 +3,13 @@ _bao_login() {
   local instance="$2"
   shift 2
 
-  export BAO_CACERT=/Users/drizzutojr/Developer/Projects/Homelab/opentofu/openbao-operations/ca_certs/prod.pem
+  BAO_CACERT="$(host_config bao_cacert)" || return 1
+  export BAO_CACERT
   export BAO_ADDR="$addr"
   export BAO_INSTANCE="$instance"
 
-  local username="drizzutojr"
+  local username
+  username="$(host_config username)" || return 1
   echo "Authenticating to $BAO_INSTANCE"
   if [[ $# -eq 2 ]]; then
     export BAO_NAMESPACE="$1"
