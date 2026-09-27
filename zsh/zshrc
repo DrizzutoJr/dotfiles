@@ -257,7 +257,6 @@ alias terraform="echo '! using tofu !' && tofu"
 
 ### Home Laptop
 
-alias cd-developer='cd "$HOME/Developer"'
 alias cd-homelab='cd "$HOME/Developer/Projects/HomeLab"'
 alias cd-dotfiles='cd "$HOME/Developer/Projects/dotfiles"'
 
@@ -268,8 +267,10 @@ developer() {
     badge "Developer"
     ps1 git k8s host
     if [[ "$1" == "-" ]]; then
-        echo "Changing to Developer Directory"
-        cd "$HOME/Developer" || return
+        local dir="/Volumes/drizzutojr/Developer"
+        [[ -d "$dir" ]] || dir="$HOME/Developer"
+        cd "$dir" || return
+        echo "Switched to $dir"
     fi
 }
 
