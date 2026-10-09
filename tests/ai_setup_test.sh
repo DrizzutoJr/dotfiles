@@ -9,7 +9,18 @@ fake_bin="$test_root/bin"
 mkdir "$fake_bin"
 cp "$repo_dir/tests/fixtures/fake_codex.sh" "$fake_bin/codex"
 cp "$repo_dir/tests/fixtures/fake_claude.sh" "$fake_bin/claude"
-chmod +x "$fake_bin/codex" "$fake_bin/claude"
+cp "$repo_dir/tests/fixtures/fake_git.sh" "$fake_bin/git"
+chmod +x "$fake_bin/codex" "$fake_bin/claude" "$fake_bin/git"
+fake_pstack_source="$test_root/pstack-source"
+mkdir -p "$fake_pstack_source/.claude-plugin" "$fake_pstack_source/plugins/pstack"
+printf '{"name":"pstack-claude","owner":{"name":"Test"},"plugins":[{"name":"pstack","source":"./plugins/pstack"}]}\n' > "$fake_pstack_source/.claude-plugin/marketplace.json"
+/usr/bin/git -C "$fake_pstack_source" init -q
+/usr/bin/git -C "$fake_pstack_source" add .
+/usr/bin/git -C "$fake_pstack_source" -c user.name=Test -c user.email=test@example.invalid commit -qm initial
+printf 'latest\n' > "$fake_pstack_source/VERSION"
+/usr/bin/git -C "$fake_pstack_source" add VERSION
+/usr/bin/git -C "$fake_pstack_source" -c user.name=Test -c user.email=test@example.invalid commit -qm latest
+export FAKE_PSTACK_SOURCE="$fake_pstack_source"
 fake_log="$test_root/codex.log"
 fake_claude_log="$test_root/claude.log"
 fake_installed="$test_root/installed"
@@ -35,6 +46,14 @@ if ! rg -F -q "plugin marketplace add https://github.com/mattpocock/skills.git -
 fi
 if ! rg -F -q 'plugin add mattpocock-skills@mattpocock --json' "$fake_log"; then
     echo "Fresh setup did not install the declared plugin" >&2
+    exit 1
+fi
+if ! rg -F -q 'plugin add pstack@pstack-claude --json' "$fake_log" || ! rg -F -q 'plugin install pstack@pstack-claude --scope user --json' "$fake_claude_log"; then
+    echo "Fresh setup did not install pstack for both agents" >&2
+    exit 1
+fi
+if [[ ! -f "$home_dir/.claude/pstack-installed" || ! -f "$fake_installed.pstack" ]]; then
+    echo "Fresh setup did not keep pstack in the user environment" >&2
     exit 1
 fi
 
@@ -71,7 +90,7 @@ fake_marketplace="$test_root/migration-marketplace"
 export FAKE_CODEX_INSTALLED="$fake_installed"
 export FAKE_CODEX_MARKETPLACE="$fake_marketplace"
 : > "$fake_installed"
-: > "$fake_marketplace"
+printf '%s\n' "$pin" > "$fake_marketplace"
 : > "$fake_log"
 mkdir -p "$migration_home/.claude" "$migration_home/.codex"
 mkdir -p "$migration_home/.agents/skills/explain-code" "$migration_home/.agents/skills/other-skill"
@@ -245,5 +264,44 @@ if [[ "$(cat "$failure_home/.agents/skills/explain-code/SKILL.md")" != "keep-old
     exit 1
 fi
 unset FAKE_CODEX_FAIL_ON
+
+claude_home="$test_root/claude-home"
+mkdir -p "$claude_home"
+run_claude_plugins() {
+    HOME="$claude_home" PATH="$fake_bin:$PATH" bash "$repo_dir/ai/install_claude_plugins.sh" "$repo_dir/ai/plugins.yaml" "$1"
+}
+run_claude_plugins pinned
+claude_checkout="$claude_home/.claude/plugins/dotfiles-marketplaces/pstack-claude"
+pinned_checkout="$(/usr/bin/git -C "$claude_checkout" rev-parse HEAD)"
+run_claude_plugins latest
+latest_checkout="$(/usr/bin/git -C "$claude_checkout" rev-parse HEAD)"
+if [[ "$pinned_checkout" == "$latest_checkout" ]]; then
+    echo "Claude Code latest did not select a newer checkout" >&2
+    exit 1
+fi
+run_claude_plugins pinned
+if [[ "$(/usr/bin/git -C "$claude_checkout" rev-parse HEAD)" != "$pinned_checkout" ]]; then
+    echo "Claude Code pinned did not restore the pinned checkout" >&2
+    exit 1
+fi
+export FAKE_CLAUDE_FAIL_ON='plugin update pstack@pstack-claude'
+if run_claude_plugins latest; then
+    echo "Claude Code plugin update failure did not fail setup" >&2
+    exit 1
+fi
+if [[ "$(/usr/bin/git -C "$claude_checkout" rev-parse HEAD)" != "$pinned_checkout" || ! -f "$claude_home/.claude/pstack-installed" ]]; then
+    echo "Claude Code plugin update failure lost the prior checkout or installation" >&2
+    exit 1
+fi
+unset FAKE_CLAUDE_FAIL_ON
+printf 'user edit\n' >> "$claude_checkout/.claude-plugin/marketplace.json"
+if run_claude_plugins pinned; then
+    echo "Claude Code setup overwrote a locally edited marketplace checkout" >&2
+    exit 1
+fi
+if ! rg -F -q 'user edit' "$claude_checkout/.claude-plugin/marketplace.json"; then
+    echo "Claude Code setup discarded a local marketplace edit" >&2
+    exit 1
+fi
 
 echo "AI setup tests passed"

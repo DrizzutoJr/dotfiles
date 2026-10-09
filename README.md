@@ -82,13 +82,16 @@ Claude configuration is preserved in `Legacy_AI/` for selective porting later. T
 backs up prior user instruction files locally and leaves credentials and sessions in each
 app's own directory.
 
-`ai/plugins.yaml` declares third-party plugin installs. The first declaration installs
-`mattpocock-skills` into Codex, with a Git commit pin; plugin files stay in Codex's user
-directory. Interactive setup asks whether to use the pinned ref or the latest marketplace
-version. `--non-interactive` uses the pin. When changing an existing marketplace between
-those choices, setup keeps a local backup and restores it if installation fails. A pinned
-rerun leaves an already installed matching plugin alone. The latest choice affects that
-machine only and does not update `ai/plugins.yaml`.
+`ai/plugins.yaml` declares third-party plugin installs. It installs `mattpocock-skills`
+for Codex and the community-maintained [pstack port](https://github.com/michael-denyer/pstack-claude)
+for both Codex and Claude Code. The official [pstack](https://github.com/cursor/plugins/tree/main/pstack)
+is for Cursor. Each declaration has a Git commit pin, and plugin files stay in the user's
+agent directories. Interactive setup asks whether to use pinned refs or the latest
+marketplace versions; `--non-interactive` uses the pins. Codex uses its marketplace ref,
+while Claude Code registers a per-user checkout at the selected commit. Setup backs up a
+managed marketplace checkout before replacing it. A pinned rerun leaves matching installed
+plugins alone. The latest choice affects that machine only and does not update
+`ai/plugins.yaml`.
 
 `ai/skills/drjr-skills/` is the local `drjr-skills` plugin for both agents. Its first
 skill is `explain-code`; add future authored skills under its `skills/` directory so they
