@@ -27,7 +27,7 @@ This is a dotfiles repository that manages configuration files via symlinks from
 | `bash/bash_profile` | `~/.bash_profile` |
 | `zsh/zshrc` | `~/.zshrc` |
 | `tmux/tmux.conf` | `~/.tmux.conf` |
-| `ai/global-instructions.md` | `~/.claude/CLAUDE.md` and `~/.codex/AGENTS.md` |
+| `ai/AGENTS.md` | `~/.claude/CLAUDE.md` and `~/.codex/AGENTS.md` |
 | `sublime/settings.json` | `~/Library/Application Support/Sublime Text/Packages/User/Preferences.sublime-settings` |
 | `sublime/CandyLand.tmTheme` | `~/Library/Application Support/Sublime Text/Packages/User/CandyLand.tmTheme` |
 | `vscode/settings.json` | `~/Library/Application Support/Code/User/settings.json` |
@@ -42,7 +42,7 @@ This is a dotfiles repository that manages configuration files via symlinks from
 - `homebrew/brew_packages.yaml` - Homebrew packages to install (parsed with yq)
 - `vscode/extensions/extension_list.yaml` - VS Code extensions to install from marketplace
 - `vscode/extensions/*/` - Local `.vsix` extension files
-- `ai/global-instructions.md` - Shared global guidance for Claude Code and Codex
+- `ai/AGENTS.md` - Shared global guidance for Claude Code and Codex
 - `ai/macos_setup.sh` - Installs user-level agent configuration after Homebrew
 - `ai/plugins.yaml` - Declares user-installed agent plugins and their pinned sources
 - `Legacy_AI/` - Archived tracked Claude Code configuration for selective porting
@@ -73,7 +73,7 @@ existing config by delegating to `zsh -c` to dump `DOTFILES_CONFIG` as tab-separ
 
 ## Important Note
 
-The `ai/global-instructions.md` file is global guidance for Claude Code and Codex. Use this root `AGENTS.md` for repo-specific instructions. `Legacy_AI/` is an archive and is not installed by setup.
+The `ai/AGENTS.md` file is global guidance for Claude Code and Codex. Use this root `AGENTS.md` for repo-specific instructions. `Legacy_AI/` is an archive and is not installed by setup.
 
 ## Agent skills
 

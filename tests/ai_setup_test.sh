@@ -45,6 +45,10 @@ if [[ "$(readlink "$codex_instructions")" != "$(readlink "$claude_instructions")
     echo "Agents do not share one global instruction source" >&2
     exit 1
 fi
+if [[ "$(readlink "$codex_instructions")" != "$repo_dir/ai/AGENTS.md" ]]; then
+    echo "Global instructions do not point to ai/AGENTS.md" >&2
+    exit 1
+fi
 if [[ ! -s "$codex_instructions" ]]; then
     echo "Shared global instructions are empty" >&2
     exit 1

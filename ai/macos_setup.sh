@@ -7,7 +7,7 @@ set -e
 echo ""
 echo "Setting up AI agent config"
 
-instructions="$REPO_DIR/ai/global-instructions.md"
+instructions="$REPO_DIR/ai/AGENTS.md"
 create_symlink "$instructions" "$HOME/.claude/CLAUDE.md"
 create_symlink "$instructions" "$HOME/.codex/AGENTS.md"
 

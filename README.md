@@ -76,7 +76,7 @@ work.
 
 ## AI agent configuration
 
-`ai/global-instructions.md` is the shared global guidance for Claude Code and Codex.
+`ai/AGENTS.md` is the shared global guidance for Claude Code and Codex.
 Run `bash ai/macos_setup.sh [--non-interactive]` to configure just the agents. Old tracked
 Claude configuration is preserved in `Legacy_AI/` for selective porting later. The setup
 backs up prior user instruction files locally and leaves credentials and sessions in each
