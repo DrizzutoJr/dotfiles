@@ -9,20 +9,34 @@ fi
 
 case "$1 $2 $3" in
     'plugin list --json')
+        plugins=
         if [[ -f "$FAKE_CODEX_INSTALLED" ]]; then
-            printf '{"installed":[{"pluginId":"mattpocock-skills@mattpocock"}]}\n'
-        else
-            printf '{"installed":[]}\n'
+            plugins='{"pluginId":"mattpocock-skills@mattpocock"}'
         fi
+        if [[ -f "$HOME/.codex/drjr-installed" ]]; then
+            [[ -z "$plugins" ]] || plugins+=,
+            plugins+="{\"pluginId\":\"drjr-skills@drjr\",\"version\":\"$(cat "$HOME/.codex/drjr-installed")\"}"
+        fi
+        printf '{"installed":[%s]}\n' "$plugins"
         ;;
     'plugin marketplace list')
+        marketplaces=
         if [[ -f "$FAKE_CODEX_MARKETPLACE" ]]; then
-            printf '{"marketplaces":[{"name":"mattpocock","root":"%s","marketplaceSource":{"sourceType":"git","source":"https://github.com/mattpocock/skills.git"}}]}\n' "$HOME/.codex/marketplace-root"
-        else
-            printf '{"marketplaces":[]}\n'
+            marketplaces="{\"name\":\"mattpocock\",\"root\":\"$HOME/.codex/marketplace-root\",\"marketplaceSource\":{\"sourceType\":\"git\",\"source\":\"https://github.com/mattpocock/skills.git\"}}"
         fi
+        if [[ -f "$HOME/.codex/drjr-marketplace" ]]; then
+            [[ -z "$marketplaces" ]] || marketplaces+=,
+            marketplaces+="{\"name\":\"drjr\",\"root\":\"$(cat "$HOME/.codex/drjr-marketplace")\",\"marketplaceSource\":{\"sourceType\":\"local\",\"source\":\"$(cat "$HOME/.codex/drjr-marketplace")\"}}"
+        fi
+        printf '{"marketplaces":[%s]}\n' "$marketplaces"
         ;;
     'plugin marketplace add')
+        if [[ "$4" == */ai/skills ]]; then
+            mkdir -p "$HOME/.codex"
+            printf '%s\n' "$4" > "$HOME/.codex/drjr-marketplace"
+            printf '{"marketplaceName":"drjr","alreadyAdded":false}\n'
+            exit 0
+        fi
         : > "$FAKE_CODEX_MARKETPLACE"
         mkdir -p "$HOME/.codex/marketplace-root"
         ref=
@@ -49,6 +63,11 @@ case "$1 $2 $3" in
         printf '{"marketplaces":[]}\n'
         ;;
     'plugin add '*)
+        if [[ "$3" == drjr-skills@drjr ]]; then
+            printf '0.1.0\n' > "$HOME/.codex/drjr-installed"
+            printf '{"pluginId":"drjr-skills@drjr","version":"0.1.0"}\n'
+            exit 0
+        fi
         : > "$FAKE_CODEX_INSTALLED"
         printf '{"pluginId":"mattpocock-skills@mattpocock"}\n'
         ;;

@@ -8,11 +8,14 @@ trap 'rm -rf "$test_root"' EXIT
 fake_bin="$test_root/bin"
 mkdir "$fake_bin"
 cp "$repo_dir/tests/fixtures/fake_codex.sh" "$fake_bin/codex"
-chmod +x "$fake_bin/codex"
+cp "$repo_dir/tests/fixtures/fake_claude.sh" "$fake_bin/claude"
+chmod +x "$fake_bin/codex" "$fake_bin/claude"
 fake_log="$test_root/codex.log"
+fake_claude_log="$test_root/claude.log"
 fake_installed="$test_root/installed"
 fake_marketplace="$test_root/marketplace"
 export FAKE_CODEX_LOG="$fake_log"
+export FAKE_CLAUDE_LOG="$fake_claude_log"
 export FAKE_CODEX_INSTALLED="$fake_installed"
 export FAKE_CODEX_MARKETPLACE="$fake_marketplace"
 
@@ -53,12 +56,14 @@ if [[ ! -s "$codex_instructions" ]]; then
     echo "Shared global instructions are empty" >&2
     exit 1
 fi
-for skill_path in "$home_dir/.claude/skills/explain-code" "$home_dir/.agents/skills/explain-code"; do
-    if [[ ! -L "$skill_path" || "$(readlink "$skill_path")" != "$repo_dir/ai/skills/explain-code" ]]; then
-        echo "Fresh setup did not install the shared explain-code skill at $skill_path" >&2
-        exit 1
-    fi
-done
+if [[ ! -f "$home_dir/.claude/drjr-installed" || ! -f "$home_dir/.codex/drjr-installed" ]]; then
+    echo "Fresh setup did not install drjr-skills for both agents" >&2
+    exit 1
+fi
+if [[ -e "$home_dir/.claude/skills/explain-code" || -e "$home_dir/.agents/skills/explain-code" ]]; then
+    echo "Fresh setup left a standalone explain-code skill" >&2
+    exit 1
+fi
 
 migration_home="$test_root/migration-home"
 fake_installed="$test_root/migration-installed"
@@ -82,7 +87,7 @@ ln -s "$repo_dir/claude_code/commands" "$migration_home/.claude/commands"
 
 run_setup "$migration_home" --non-interactive
 
-if rg -q 'plugin (marketplace (add|upgrade)|add)' "$fake_log"; then
+if rg -q 'plugin (marketplace (add|upgrade) https://github.com/mattpocock/skills.git|add mattpocock-skills@mattpocock)' "$fake_log"; then
     echo "Pinned rerun modified an already installed plugin" >&2
     exit 1
 fi
@@ -99,17 +104,21 @@ if [[ "$(cat "$migration_home/.claude/local-state")" != "keep-local-state" ]]; t
     echo "Migration changed local app state" >&2
     exit 1
 fi
-if [[ ! -L "$migration_home/.agents/skills/explain-code" || ! -L "$migration_home/.claude/skills/explain-code" ]]; then
-    echo "Migration did not link the shared explain-code skill" >&2
+if [[ ! -f "$migration_home/.claude/drjr-installed" || ! -f "$migration_home/.codex/drjr-installed" ]]; then
+    echo "Migration did not install drjr-skills" >&2
     exit 1
 fi
 if [[ "$(cat "$migration_home/.agents/skills/other-skill/SKILL.md")" != "keep-other-skill" ]]; then
     echo "Migration changed an unrelated skill" >&2
     exit 1
 fi
-backed_up_skill="$(rg -l --no-ignore --glob '*' '^previous-explain-code$' "$migration_home/.agents/skills" || true)"
+backed_up_skill="$(rg -l --no-ignore --glob '*' '^previous-explain-code$' "$migration_home/.agents/skill-backups" || true)"
 if [[ ! -f "$backed_up_skill" ]]; then
     echo "Migration did not preserve the prior explain-code skill" >&2
+    exit 1
+fi
+if [[ -e "$migration_home/.agents/skills/explain-code" || -L "$migration_home/.agents/skills/explain-code" || -e "$migration_home/.claude/skills/explain-code" || -L "$migration_home/.claude/skills/explain-code" ]]; then
+    echo "Migration left duplicate standalone explain-code skills" >&2
     exit 1
 fi
 backed_up_instructions="$(rg -l --no-ignore --glob '*' '^user-codex-instructions$' "$migration_home/.codex" || true)"
@@ -119,10 +128,26 @@ if [[ ! -f "$backed_up_instructions" ]]; then
 fi
 
 backup_count_before="$(find "$migration_home" -type d -name '*.bak.*' | wc -l)"
+: > "$fake_log"
+: > "$fake_claude_log"
 run_setup "$migration_home" --non-interactive
 backup_count_after="$(find "$migration_home" -type d -name '*.bak.*' | wc -l)"
 if [[ "$backup_count_before" != "$backup_count_after" ]]; then
     echo "Rerunning setup created unnecessary backups" >&2
+    exit 1
+fi
+if rg -q 'plugin (marketplace add|add drjr-skills@drjr)' "$fake_log" || rg -q 'plugin (marketplace add|install|update)' "$fake_claude_log"; then
+    echo "Rerunning setup changed an already installed local plugin" >&2
+    exit 1
+fi
+
+printf '0.0.1\n' > "$migration_home/.codex/drjr-installed"
+printf '0.0.1\n' > "$migration_home/.claude/drjr-installed"
+: > "$fake_log"
+: > "$fake_claude_log"
+run_setup "$migration_home" --non-interactive
+if ! rg -F -q 'plugin add drjr-skills@drjr --json' "$fake_log" || ! rg -F -q 'plugin update drjr-skills@drjr --scope user --json' "$fake_claude_log"; then
+    echo "Setup did not update both agents when the local plugin version changed" >&2
     exit 1
 fi
 
@@ -200,7 +225,8 @@ if ! rg -F -q 'Codex CLI is required' "$test_root/missing.out"; then
 fi
 
 failure_home="$test_root/failure-home"
-mkdir "$failure_home"
+mkdir -p "$failure_home/.agents/skills/explain-code"
+printf 'keep-old-skill\n' > "$failure_home/.agents/skills/explain-code/SKILL.md"
 fake_installed="$test_root/failure-installed"
 fake_marketplace="$test_root/failure-marketplace"
 export FAKE_CODEX_INSTALLED="$fake_installed"
@@ -212,6 +238,10 @@ if run_setup "$failure_home" --non-interactive; then
 fi
 if [[ ! -L "$failure_home/.claude/CLAUDE.md" || ! -L "$failure_home/.codex/AGENTS.md" ]]; then
     echo "Marketplace failure removed instruction links" >&2
+    exit 1
+fi
+if [[ "$(cat "$failure_home/.agents/skills/explain-code/SKILL.md")" != "keep-old-skill" ]]; then
+    echo "Plugin failure archived the old skill before installation succeeded" >&2
     exit 1
 fi
 unset FAKE_CODEX_FAIL_ON

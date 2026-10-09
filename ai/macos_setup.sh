@@ -28,15 +28,6 @@ for legacy_name in skills commands; do
     esac
 done
 
-skill="$REPO_DIR/ai/skills/explain-code"
-for skill_parent in "$HOME/.claude/skills" "$HOME/.agents/skills"; do
-    if [[ -L "$skill_parent" ]]; then
-        echo "! Skill directory is a symlink outside this setup's ownership: $skill_parent" >&2
-        exit 1
-    fi
-    create_dir_symlink "$skill" "$skill_parent/explain-code"
-done
-
 if ! command -v yq >/dev/null 2>&1; then
     echo "! yq is required to read ai/plugins.yaml" >&2
     exit 1
@@ -45,6 +36,36 @@ if ! command -v codex >/dev/null 2>&1; then
     echo "! Codex CLI is required to install declared plugins" >&2
     exit 1
 fi
+if ! command -v claude >/dev/null 2>&1; then
+    echo "! Claude Code CLI is required to install drjr-skills" >&2
+    exit 1
+fi
+
+bash "$REPO_DIR/ai/install_drjr_plugin.sh" "$@"
+
+for skill_parent in "$HOME/.claude/skills" "$HOME/.agents/skills"; do
+    if [[ -L "$skill_parent" ]]; then
+        echo "! Skill directory is a symlink outside this setup's ownership: $skill_parent" >&2
+        exit 1
+    fi
+    backup_root="$(dirname "$skill_parent")/skill-backups"
+    for old_backup in "$skill_parent"/explain-code.bak.*; do
+        if [[ ! -e "$old_backup" && ! -L "$old_backup" ]]; then
+            continue
+        fi
+        mkdir -p "$backup_root"
+        backup_dir="$(mktemp -d "$backup_root/explain-code.XXXXXX")"
+        mv "$old_backup" "$backup_dir/previous-backup"
+        echo "..Moved prior skill backup to $backup_dir/previous-backup"
+    done
+    old_skill="$skill_parent/explain-code"
+    if [[ -e "$old_skill" || -L "$old_skill" ]]; then
+        mkdir -p "$backup_root"
+        backup_dir="$(mktemp -d "$backup_root/explain-code.XXXXXX")"
+        mv "$old_skill" "$backup_dir/original"
+        echo "..Archived standalone skill at $backup_dir/original"
+    fi
+done
 
 plugin_selection=pinned
 if [[ "$NON_INTERACTIVE" != true ]]; then

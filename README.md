@@ -90,10 +90,13 @@ those choices, setup keeps a local backup and restores it if installation fails.
 rerun leaves an already installed matching plugin alone. The latest choice affects that
 machine only and does not update `ai/plugins.yaml`.
 
-`ai/skills/explain-code/` is an authored skill installed for both agents. Setup links it
-individually under `~/.claude/skills/` and `~/.agents/skills/`, leaving other skills in
-those directories in place. Add future authored skills under `ai/skills/<name>/` and link
-each one individually.
+`ai/skills/drjr-skills/` is the local `drjr-skills` plugin for both agents. Its first
+skill is `explain-code`; add future authored skills under its `skills/` directory so they
+install together. Setup registers `ai/skills/` as a local marketplace in Claude Code and
+Codex, then installs `drjr-skills@drjr` at user scope. When the collection changes, bump
+the plugin version in its manifest and rerun setup to update both installations. The
+former standalone `explain-code` skill and its local backups move to each agent's
+`skill-backups/` directory so the plugin supplies the only active copy.
 
 ## Adding a new dotfile
 

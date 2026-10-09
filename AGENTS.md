@@ -28,7 +28,6 @@ This is a dotfiles repository that manages configuration files via symlinks from
 | `zsh/zshrc` | `~/.zshrc` |
 | `tmux/tmux.conf` | `~/.tmux.conf` |
 | `ai/AGENTS.md` | `~/.claude/CLAUDE.md` and `~/.codex/AGENTS.md` |
-| `ai/skills/explain-code/` | `~/.claude/skills/explain-code` and `~/.agents/skills/explain-code` |
 | `sublime/settings.json` | `~/Library/Application Support/Sublime Text/Packages/User/Preferences.sublime-settings` |
 | `sublime/CandyLand.tmTheme` | `~/Library/Application Support/Sublime Text/Packages/User/CandyLand.tmTheme` |
 | `vscode/settings.json` | `~/Library/Application Support/Code/User/settings.json` |
@@ -45,6 +44,8 @@ This is a dotfiles repository that manages configuration files via symlinks from
 - `vscode/extensions/*/` - Local `.vsix` extension files
 - `ai/AGENTS.md` - Shared global guidance for Claude Code and Codex
 - `ai/macos_setup.sh` - Installs user-level agent configuration after Homebrew
+- `ai/skills/drjr-skills/` - Local plugin containing authored skills for both agents
+- `ai/install_drjr_plugin.sh` - Installs the local `drjr-skills` plugin into both agents
 - `ai/plugins.yaml` - Declares user-installed agent plugins and their pinned sources
 - `Legacy_AI/` - Archived tracked Claude Code configuration for selective porting
 
