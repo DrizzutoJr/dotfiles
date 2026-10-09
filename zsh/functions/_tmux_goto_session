@@ -7,8 +7,20 @@ if [[ -z "$session_name" ]]; then
   return 1
 fi
 
-if [[ -n "$TMUX" ]]; then
+local pane_tty=""
+if [[ -n "$TMUX" && -n "$TMUX_PANE" ]]; then
+  pane_tty="$(tmux display-message -p -t "$TMUX_PANE" '#{pane_tty}' 2>/dev/null)" || pane_tty=""
+fi
+
+if [[ -n "$pane_tty" && "$pane_tty" == "$(tty 2>/dev/null)" ]]; then
   tmux switch-client -t "=${session_name}"
 else
-  tmux attach-session -t "=${session_name}"
+  local -a tmux_command=(tmux)
+  if [[ -n "$TMUX" ]]; then
+    tmux_command+=(-S "${TMUX%%,*}")
+  fi
+  (
+    unset TMUX TMUX_PANE
+    "${tmux_command[@]}" attach-session -t "=${session_name}"
+  )
 fi
