@@ -1,0 +1,6 @@
+plugins:
+  - agent: codex
+    name: mattpocock-skills
+    marketplace: mattpocock
+    source: https://github.com/mattpocock/skills.git
+    ref: b0618bc436ad893b3c5e84e55fba86586d34a404
