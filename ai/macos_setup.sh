@@ -28,6 +28,15 @@ for legacy_name in skills commands; do
     esac
 done
 
+skill="$REPO_DIR/ai/skills/explain-code"
+for skill_parent in "$HOME/.claude/skills" "$HOME/.agents/skills"; do
+    if [[ -L "$skill_parent" ]]; then
+        echo "! Skill directory is a symlink outside this setup's ownership: $skill_parent" >&2
+        exit 1
+    fi
+    create_dir_symlink "$skill" "$skill_parent/explain-code"
+done
+
 if ! command -v yq >/dev/null 2>&1; then
     echo "! yq is required to read ai/plugins.yaml" >&2
     exit 1

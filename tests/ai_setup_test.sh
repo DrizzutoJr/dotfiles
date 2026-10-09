@@ -53,6 +53,12 @@ if [[ ! -s "$codex_instructions" ]]; then
     echo "Shared global instructions are empty" >&2
     exit 1
 fi
+for skill_path in "$home_dir/.claude/skills/explain-code" "$home_dir/.agents/skills/explain-code"; do
+    if [[ ! -L "$skill_path" || "$(readlink "$skill_path")" != "$repo_dir/ai/skills/explain-code" ]]; then
+        echo "Fresh setup did not install the shared explain-code skill at $skill_path" >&2
+        exit 1
+    fi
+done
 
 migration_home="$test_root/migration-home"
 fake_installed="$test_root/migration-installed"
@@ -63,6 +69,9 @@ export FAKE_CODEX_MARKETPLACE="$fake_marketplace"
 : > "$fake_marketplace"
 : > "$fake_log"
 mkdir -p "$migration_home/.claude" "$migration_home/.codex"
+mkdir -p "$migration_home/.agents/skills/explain-code" "$migration_home/.agents/skills/other-skill"
+printf 'previous-explain-code\n' > "$migration_home/.agents/skills/explain-code/SKILL.md"
+printf 'keep-other-skill\n' > "$migration_home/.agents/skills/other-skill/SKILL.md"
 mkdir "$migration_home/.codex/marketplace-root"
 printf '[marketplaces.mattpocock]\nsource_type = "git"\nsource = "https://github.com/mattpocock/skills.git"\nref = "%s"\n' "$pin" > "$migration_home/.codex/config.toml"
 printf 'user-codex-instructions\n' > "$migration_home/.codex/AGENTS.md"
@@ -88,6 +97,19 @@ if [[ -L "$migration_home/.claude/commands" ]]; then
 fi
 if [[ "$(cat "$migration_home/.claude/local-state")" != "keep-local-state" ]]; then
     echo "Migration changed local app state" >&2
+    exit 1
+fi
+if [[ ! -L "$migration_home/.agents/skills/explain-code" || ! -L "$migration_home/.claude/skills/explain-code" ]]; then
+    echo "Migration did not link the shared explain-code skill" >&2
+    exit 1
+fi
+if [[ "$(cat "$migration_home/.agents/skills/other-skill/SKILL.md")" != "keep-other-skill" ]]; then
+    echo "Migration changed an unrelated skill" >&2
+    exit 1
+fi
+backed_up_skill="$(rg -l --no-ignore --glob '*' '^previous-explain-code$' "$migration_home/.agents/skills" || true)"
+if [[ ! -f "$backed_up_skill" ]]; then
+    echo "Migration did not preserve the prior explain-code skill" >&2
     exit 1
 fi
 backed_up_instructions="$(rg -l --no-ignore --glob '*' '^user-codex-instructions$' "$migration_home/.codex" || true)"

@@ -90,9 +90,10 @@ those choices, setup keeps a local backup and restores it if installation fails.
 rerun leaves an already installed matching plugin alone. The latest choice affects that
 machine only and does not update `ai/plugins.yaml`.
 
-When adding an authored skill later, put it under `ai/skills/<name>/` and install that
-skill individually. Keep agent-owned skills directories available for app-managed and
-third-party content.
+`ai/skills/explain-code/` is an authored skill installed for both agents. Setup links it
+individually under `~/.claude/skills/` and `~/.agents/skills/`, leaving other skills in
+those directories in place. Add future authored skills under `ai/skills/<name>/` and link
+each one individually.
 
 ## Adding a new dotfile
 
