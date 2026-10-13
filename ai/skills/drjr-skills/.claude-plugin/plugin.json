@@ -1,0 +1,9 @@
+{
+  "name": "drjr-skills",
+  "version": "0.1.0",
+  "description": "DrizzutoJr's collection of skills for understanding code.",
+  "author": {
+    "name": "DrizzutoJr"
+  },
+  "skills": "./skills/"
+}

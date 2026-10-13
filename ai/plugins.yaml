@@ -1,0 +1,17 @@
+plugins:
+  - agent: codex
+    name: mattpocock-skills
+    marketplace: mattpocock
+    source: https://github.com/mattpocock/skills.git
+    ref: b0618bc436ad893b3c5e84e55fba86586d34a404
+  - agent: codex
+    name: pstack
+    marketplace: pstack-claude
+    source: https://github.com/michael-denyer/pstack-claude.git
+    ref: 24c96b1eed2b07c62d0f88f0764a2954ed1d911a
+  - agent: claude
+    name: pstack
+    marketplace: pstack-claude
+    source: https://github.com/michael-denyer/pstack-claude.git
+    path: plugins/pstack
+    ref: 24c96b1eed2b07c62d0f88f0764a2954ed1d911a

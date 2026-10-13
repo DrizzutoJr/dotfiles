@@ -27,9 +27,7 @@ This is a dotfiles repository that manages configuration files via symlinks from
 | `bash/bash_profile` | `~/.bash_profile` |
 | `zsh/zshrc` | `~/.zshrc` |
 | `tmux/tmux.conf` | `~/.tmux.conf` |
-| `claude_code/CLAUDE.md` | `~/.claude/CLAUDE.md` |
-| `claude_code/skills/` | `~/.claude/skills` |
-| `claude_code/commands/` | `~/.claude/commands` |
+| `ai/AGENTS.md` | `~/.claude/CLAUDE.md` and `~/.codex/AGENTS.md` |
 | `sublime/settings.json` | `~/Library/Application Support/Sublime Text/Packages/User/Preferences.sublime-settings` |
 | `sublime/CandyLand.tmTheme` | `~/Library/Application Support/Sublime Text/Packages/User/CandyLand.tmTheme` |
 | `vscode/settings.json` | `~/Library/Application Support/Code/User/settings.json` |
@@ -44,9 +42,12 @@ This is a dotfiles repository that manages configuration files via symlinks from
 - `homebrew/brew_packages.yaml` - Homebrew packages to install (parsed with yq)
 - `vscode/extensions/extension_list.yaml` - VS Code extensions to install from marketplace
 - `vscode/extensions/*/` - Local `.vsix` extension files
-- `claude_code/CLAUDE.md` - Global Claude Code behavioral settings (symlinked to ~/.claude/CLAUDE.md)
-- `claude_code/skills/` - Custom Claude Code skills (symlinked to ~/.claude/skills)
-- `claude_code/commands/` - Custom Claude Code commands (symlinked to ~/.claude/commands)
+- `ai/AGENTS.md` - Shared global guidance for Claude Code and Codex
+- `ai/macos_setup.sh` - Installs user-level agent configuration after Homebrew
+- `ai/skills/drjr-skills/` - Local plugin containing authored skills for both agents
+- `ai/install_drjr_plugin.sh` - Installs the local `drjr-skills` plugin into both agents
+- `ai/plugins.yaml` - Declares user-installed agent plugins and their pinned sources
+- `Legacy_AI/` - Archived tracked Claude Code configuration for selective porting
 
 ### Adding New Dotfiles
 
@@ -74,7 +75,21 @@ existing config by delegating to `zsh -c` to dump `DOTFILES_CONFIG` as tab-separ
 
 ## Important Note
 
-The `claude_code/CLAUDE.md` file in this repo is **not** repo-specific guidance. It contains global Claude Code behavioral settings that get symlinked to `~/.claude/CLAUDE.md`. Do not modify it for repo-specific instructions - use this root `AGENTS.md` instead.
+The `ai/AGENTS.md` file is global guidance for Claude Code and Codex. Use this root `AGENTS.md` for repo-specific instructions. `Legacy_AI/` is an archive and is not installed by setup.
+
+## Agent skills
+
+### Issue tracker
+
+Specs and implementation tickets live under `.scratch/<feature>/`. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Use the five default triage roles as local issue statuses. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+This repo has one domain context. Read the root glossary and relevant ADRs as described in `docs/agents/domain.md`.
 
 
 ## Behaviours

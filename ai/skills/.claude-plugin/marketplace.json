@@ -1,0 +1,14 @@
+{
+  "name": "drjr",
+  "description": "DrizzutoJr's agent skills.",
+  "owner": {
+    "name": "DrizzutoJr"
+  },
+  "plugins": [
+    {
+      "name": "drjr-skills",
+      "source": "./drjr-skills",
+      "description": "Skills for understanding code."
+    }
+  ]
+}

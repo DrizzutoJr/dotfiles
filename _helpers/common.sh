@@ -22,12 +22,29 @@ for arg in "$@"; do
     esac
 done
 
-# Helper function to create symlink with backup
-create_symlink() {
+backup_target() {
+    local target="$1"
+    local backup_dir
+    backup_dir="$(mktemp -d "${target}.bak.XXXXXX")" || return 1
+
+    if ! mv "$target" "$backup_dir/original"; then
+        rmdir "$backup_dir" 2>/dev/null || true
+        return 1
+    fi
+
+    printf '%s\n' "$backup_dir/original"
+}
+
+link_with_backup() {
     local source="$1"
     local target="$2"
-    local target_dir
+    local target_dir backup_path
     target_dir="$(dirname "$target")"
+
+    if [[ -L "$target" && "$(readlink "$target")" == "$source" ]]; then
+        echo "..Already linked: $target"
+        return 0
+    fi
 
     # Create target directory if it doesn't exist
     if [[ ! -d "$target_dir" ]]; then
@@ -35,19 +52,35 @@ create_symlink() {
         mkdir -p "$target_dir"
     fi
 
-    # Backup existing file if it's not already a symlink
-    if [[ -f "$target" && ! -L "$target" ]]; then
-        echo "..Backing up existing file: $target"
-        mv "$target" "${target}.bak"
-    fi
-
-    # Remove existing symlink if present
-    if [[ -L "$target" ]]; then
-        rm "$target"
+    if [[ -e "$target" || -L "$target" ]]; then
+        backup_path="$(backup_target "$target")" || return 1
+        echo "..Backed up $target to $backup_path"
     fi
 
     echo "..Linking $source -> $target"
-    ln -sf "$source" "$target"
+    if ! ln -s "$source" "$target"; then
+        if [[ -n "$backup_path" && ! -e "$target" && ! -L "$target" ]]; then
+            if mv "$backup_path" "$target"; then
+                rmdir "$(dirname "$backup_path")" 2>/dev/null || true
+            else
+                echo "! Could not restore $target; original is at $backup_path" >&2
+            fi
+        fi
+        return 1
+    fi
+}
+
+# Helper function to create file symlink with backup
+create_symlink() {
+    local source="$1"
+    local target="$2"
+
+    if [[ ! -f "$source" ]]; then
+        echo "! Missing source file: $source" >&2
+        return 1
+    fi
+
+    link_with_backup "$source" "$target"
 }
 
 # Helper function to create directory symlink with backup
@@ -55,17 +88,10 @@ create_dir_symlink() {
     local source="$1"
     local target="$2"
 
-    # Backup existing directory if it's not already a symlink
-    if [[ -d "$target" && ! -L "$target" ]]; then
-        echo "..Backing up existing directory: $target"
-        mv "$target" "${target}.bak"
+    if [[ ! -d "$source" ]]; then
+        echo "! Missing source directory: $source" >&2
+        return 1
     fi
 
-    # Remove existing symlink if present
-    if [[ -L "$target" ]]; then
-        rm "$target"
-    fi
-
-    echo "..Linking $source -> $target"
-    ln -sf "$source" "$target"
+    link_with_backup "$source" "$target"
 }
