@@ -9,18 +9,7 @@ fake_bin="$test_root/bin"
 mkdir "$fake_bin"
 cp "$repo_dir/tests/fixtures/fake_codex.sh" "$fake_bin/codex"
 cp "$repo_dir/tests/fixtures/fake_claude.sh" "$fake_bin/claude"
-cp "$repo_dir/tests/fixtures/fake_git.sh" "$fake_bin/git"
-chmod +x "$fake_bin/codex" "$fake_bin/claude" "$fake_bin/git"
-fake_pstack_source="$test_root/pstack-source"
-mkdir -p "$fake_pstack_source/.claude-plugin" "$fake_pstack_source/plugins/pstack"
-printf '{"name":"pstack-claude","owner":{"name":"Test"},"plugins":[{"name":"pstack","source":"./plugins/pstack"}]}\n' > "$fake_pstack_source/.claude-plugin/marketplace.json"
-/usr/bin/git -C "$fake_pstack_source" init -q
-/usr/bin/git -C "$fake_pstack_source" add .
-/usr/bin/git -C "$fake_pstack_source" -c user.name=Test -c user.email=test@example.invalid commit -qm initial
-printf 'latest\n' > "$fake_pstack_source/VERSION"
-/usr/bin/git -C "$fake_pstack_source" add VERSION
-/usr/bin/git -C "$fake_pstack_source" -c user.name=Test -c user.email=test@example.invalid commit -qm latest
-export FAKE_PSTACK_SOURCE="$fake_pstack_source"
+chmod +x "$fake_bin/codex" "$fake_bin/claude"
 fake_log="$test_root/codex.log"
 fake_claude_log="$test_root/claude.log"
 fake_installed="$test_root/installed"
@@ -271,17 +260,20 @@ run_claude_plugins() {
     HOME="$claude_home" PATH="$fake_bin:$PATH" bash "$repo_dir/ai/install_claude_plugins.sh" "$repo_dir/ai/plugins.yaml" "$1"
 }
 run_claude_plugins pinned
-claude_checkout="$claude_home/.claude/plugins/dotfiles-marketplaces/pstack-claude"
-pinned_checkout="$(/usr/bin/git -C "$claude_checkout" rev-parse HEAD)"
+claude_marketplace="$claude_home/.claude/plugins/dotfiles-marketplaces/pstack-claude/.claude-plugin/marketplace.json"
+pstack_pin="$(yq -r '.plugins[] | select(.agent == "claude" and .name == "pstack") | .ref' "$repo_dir/ai/plugins.yaml")"
+if [[ "$(yq -r '.plugins[0].source.sha' "$claude_marketplace")" != "$pstack_pin" ]]; then
+    echo "Claude Code marketplace did not pin pstack" >&2
+    exit 1
+fi
 run_claude_plugins latest
-latest_checkout="$(/usr/bin/git -C "$claude_checkout" rev-parse HEAD)"
-if [[ "$pinned_checkout" == "$latest_checkout" ]]; then
-    echo "Claude Code latest did not select a newer checkout" >&2
+if [[ "$(yq -r '.plugins[0].source.sha // ""' "$claude_marketplace")" != '' ]]; then
+    echo "Claude Code latest marketplace kept the pin" >&2
     exit 1
 fi
 run_claude_plugins pinned
-if [[ "$(/usr/bin/git -C "$claude_checkout" rev-parse HEAD)" != "$pinned_checkout" ]]; then
-    echo "Claude Code pinned did not restore the pinned checkout" >&2
+if [[ "$(yq -r '.plugins[0].source.sha' "$claude_marketplace")" != "$pstack_pin" ]]; then
+    echo "Claude Code pinned did not restore the marketplace pin" >&2
     exit 1
 fi
 export FAKE_CLAUDE_FAIL_ON='plugin update pstack@pstack-claude'
@@ -289,17 +281,17 @@ if run_claude_plugins latest; then
     echo "Claude Code plugin update failure did not fail setup" >&2
     exit 1
 fi
-if [[ "$(/usr/bin/git -C "$claude_checkout" rev-parse HEAD)" != "$pinned_checkout" || ! -f "$claude_home/.claude/pstack-installed" ]]; then
-    echo "Claude Code plugin update failure lost the prior checkout or installation" >&2
+if [[ "$(yq -r '.plugins[0].source.sha' "$claude_marketplace")" != "$pstack_pin" || ! -f "$claude_home/.claude/pstack-installed" ]]; then
+    echo "Claude Code plugin update failure lost the prior marketplace or installation" >&2
     exit 1
 fi
 unset FAKE_CLAUDE_FAIL_ON
-printf 'user edit\n' >> "$claude_checkout/.claude-plugin/marketplace.json"
+printf 'user edit\n' >> "$claude_marketplace"
 if run_claude_plugins pinned; then
-    echo "Claude Code setup overwrote a locally edited marketplace checkout" >&2
+    echo "Claude Code setup overwrote a locally edited marketplace" >&2
     exit 1
 fi
-if ! rg -F -q 'user edit' "$claude_checkout/.claude-plugin/marketplace.json"; then
+if ! rg -F -q 'user edit' "$claude_marketplace"; then
     echo "Claude Code setup discarded a local marketplace edit" >&2
     exit 1
 fi

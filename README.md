@@ -88,8 +88,8 @@ for both Codex and Claude Code. The official [pstack](https://github.com/cursor/
 is for Cursor. Each declaration has a Git commit pin, and plugin files stay in the user's
 agent directories. Interactive setup asks whether to use pinned refs or the latest
 marketplace versions; `--non-interactive` uses the pins. Codex uses its marketplace ref,
-while Claude Code registers a per-user checkout at the selected commit. Setup backs up a
-managed marketplace checkout before replacing it. A pinned rerun leaves matching installed
+while Claude Code uses a per-user marketplace entry with a pinned Git source. Setup backs up
+the managed marketplace entry before changing it. A pinned rerun leaves matching installed
 plugins alone. The latest choice affects that machine only and does not update
 `ai/plugins.yaml`.
 

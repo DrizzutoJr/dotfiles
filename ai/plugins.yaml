@@ -13,4 +13,5 @@ plugins:
     name: pstack
     marketplace: pstack-claude
     source: https://github.com/michael-denyer/pstack-claude.git
+    path: plugins/pstack
     ref: 24c96b1eed2b07c62d0f88f0764a2954ed1d911a

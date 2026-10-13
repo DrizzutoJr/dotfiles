@@ -4,10 +4,6 @@ set -e
 
 manifest="$1"
 selection="$2"
-if ! command -v git >/dev/null 2>&1; then
-    echo "! Git is required to install Claude Code plugins" >&2
-    exit 1
-fi
 if [[ "$selection" != pinned && "$selection" != latest ]]; then
     echo "! Plugin selection must be pinned or latest" >&2
     exit 1
@@ -22,8 +18,9 @@ for ((plugin_index=0; plugin_index<plugin_count; plugin_index++)); do
     name="$(yq -r ".plugins[$plugin_index].name" "$manifest")"
     marketplace="$(yq -r ".plugins[$plugin_index].marketplace" "$manifest")"
     source="$(yq -r ".plugins[$plugin_index].source" "$manifest")"
+    path="$(yq -r ".plugins[$plugin_index].path" "$manifest")"
     ref="$(yq -r ".plugins[$plugin_index].ref" "$manifest")"
-    if [[ -z "$name" || "$name" == null || -z "$marketplace" || "$marketplace" == null || -z "$source" || "$source" == null || ! "$ref" =~ ^[a-f0-9]{40}$ ]]; then
+    if [[ ! "$name" =~ ^[a-zA-Z0-9][a-zA-Z0-9._-]*$ || ! "$marketplace" =~ ^[a-zA-Z0-9][a-zA-Z0-9._-]*$ || "$source" != https://* || "$path" != plugins/* || ! "$ref" =~ ^[a-f0-9]{40}$ ]]; then
         echo "! Invalid Claude Code plugin declaration at index $plugin_index" >&2
         exit 1
     fi
@@ -33,12 +30,18 @@ for ((plugin_index=0; plugin_index<plugin_count; plugin_index++)); do
     marker="$target/.dotfiles-source"
     mkdir -p "$marketplace_parent"
     if [[ -e "$target" || -L "$target" ]]; then
-        if [[ ! -d "$target/.git" || ! -f "$marker" || "$(cat "$marker")" != "$source" ]]; then
-            echo "! Existing Claude Code marketplace checkout is not managed by dotfiles: $target" >&2
+        if [[ ! -d "$target" || ! -f "$marker" || "$(cat "$marker")" != "$source" ]]; then
+            echo "! Existing Claude Code marketplace is not managed by dotfiles: $target" >&2
             exit 1
         fi
-        if [[ -n "$(git -C "$target" status --porcelain --untracked-files=no)" ]]; then
-            echo "! Claude Code marketplace checkout has local changes: $target" >&2
+        if [[ -d "$target/.git" ]]; then
+            # Migrate the earlier managed clone without losing local edits.
+            if [[ -n "$(git -C "$target" status --porcelain --untracked-files=all -- . ':(exclude).dotfiles-source')" ]]; then
+                echo "! Claude Code marketplace checkout has local changes: $target" >&2
+                exit 1
+            fi
+        elif [[ ! -f "$target/.dotfiles-manifest-sha256" || "$(shasum -a 256 "$target/.claude-plugin/marketplace.json" | cut -d ' ' -f 1)" != "$(cat "$target/.dotfiles-manifest-sha256")" ]]; then
+            echo "! Claude Code marketplace manifest has local changes: $target" >&2
             exit 1
         fi
     fi
@@ -63,37 +66,36 @@ for ((plugin_index=0; plugin_index<plugin_count; plugin_index++)); do
     }
     installed_id="$(printf '%s\n' "$installed" | PLUGIN_SELECTOR="$selector" yq -r '.[] | select(.id == strenv(PLUGIN_SELECTOR) and .scope == "user") | .id')" || exit 1
 
+    staging="$(mktemp -d "$marketplace_parent/$marketplace.stage.XXXXXX")"
+    mkdir -p "$staging/.claude-plugin"
+    if [[ "$selection" == pinned ]]; then
+        PLUGIN_NAME="$name" PLUGIN_MARKETPLACE="$marketplace" PLUGIN_SOURCE="$source" PLUGIN_PATH="$path" PLUGIN_SHA="$ref" \
+            yq -n -o=json '{"name": strenv(PLUGIN_MARKETPLACE), "owner": {"name": "dotfiles"}, "plugins": [{"name": strenv(PLUGIN_NAME), "source": {"source": "git-subdir", "url": strenv(PLUGIN_SOURCE), "path": strenv(PLUGIN_PATH), "sha": strenv(PLUGIN_SHA)}}]}' \
+            > "$staging/.claude-plugin/marketplace.json"
+    else
+        PLUGIN_NAME="$name" PLUGIN_MARKETPLACE="$marketplace" PLUGIN_SOURCE="$source" PLUGIN_PATH="$path" \
+            yq -n -o=json '{"name": strenv(PLUGIN_MARKETPLACE), "owner": {"name": "dotfiles"}, "plugins": [{"name": strenv(PLUGIN_NAME), "source": {"source": "git-subdir", "url": strenv(PLUGIN_SOURCE), "path": strenv(PLUGIN_PATH)}}]}' \
+            > "$staging/.claude-plugin/marketplace.json"
+    fi
+    printf '%s\n' "$source" > "$staging/.dotfiles-source"
+    shasum -a 256 "$staging/.claude-plugin/marketplace.json" | cut -d ' ' -f 1 > "$staging/.dotfiles-manifest-sha256"
+    if ! claude plugin validate "$staging" >/dev/null; then
+        rm -rf "$staging"
+        echo "! Invalid Claude Code marketplace for $selector" >&2
+        exit 1
+    fi
+
     changed=false
     backup_dir=
-    current_ref=
-    if [[ -d "$target/.git" ]]; then
-        current_ref="$(git -C "$target" rev-parse HEAD)"
-    fi
-    if [[ "$selection" == latest || "$current_ref" != "$ref" ]]; then
-        staging="$(mktemp -d "$marketplace_parent/$marketplace.stage.XXXXXX")"
-        if ! git clone --quiet "$source" "$staging"; then
-            rm -rf "$staging"
-            echo "! Could not fetch Claude Code marketplace $marketplace" >&2
-            exit 1
+    if [[ ! -d "$target" || ! -f "$target/.claude-plugin/marketplace.json" ]] || ! cmp -s "$target/.claude-plugin/marketplace.json" "$staging/.claude-plugin/marketplace.json"; then
+        if [[ -d "$target" ]]; then
+            backup_dir="$(mktemp -d "$marketplace_parent/$marketplace.backup.XXXXXX")"
+            mv "$target" "$backup_dir/previous"
         fi
-        if [[ "$selection" == pinned ]] && ! git -C "$staging" checkout --detach --quiet "$ref"; then
-            rm -rf "$staging"
-            echo "! Could not check out pinned Claude Code marketplace $marketplace ($ref)" >&2
-            exit 1
-        fi
-        printf '%s\n' "$source" > "$staging/.dotfiles-source"
-        new_ref="$(git -C "$staging" rev-parse HEAD)"
-        if [[ "$new_ref" != "$current_ref" ]]; then
-            if [[ -d "$target" ]]; then
-                backup_dir="$(mktemp -d "$marketplace_parent/$marketplace.backup.XXXXXX")"
-                mv "$target" "$backup_dir/previous"
-            fi
-            mv "$staging" "$target"
-            changed=true
-        else
-            # The local checkout already has the selected revision.
-            rm -rf "$staging"
-        fi
+        mv "$staging" "$target"
+        changed=true
+    else
+        rm -rf "$staging"
     fi
 
     if [[ -z "$existing_path" ]]; then
@@ -122,7 +124,7 @@ for ((plugin_index=0; plugin_index<plugin_count; plugin_index++)); do
             if [[ -n "$backup_dir" ]]; then
                 mv "$target" "$backup_dir/failed"
                 mv "$backup_dir/previous" "$target"
-                echo "! Restored prior Claude Code marketplace checkout; failed copy: $backup_dir/failed" >&2
+                echo "! Restored prior Claude Code marketplace; failed copy: $backup_dir/failed" >&2
             fi
             echo "! Could not update Claude Code plugin $selector" >&2
             exit 1

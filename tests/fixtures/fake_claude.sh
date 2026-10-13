@@ -8,6 +8,8 @@ if [[ -n "$FAKE_CLAUDE_FAIL_ON" && "$*" == *"$FAKE_CLAUDE_FAIL_ON"* ]]; then
 fi
 
 case "$1 $2 $3" in
+    'plugin validate '*)
+        ;;
     'plugin marketplace list')
         marketplaces=
         if [[ -f "$HOME/.claude/drjr-marketplace" ]]; then
