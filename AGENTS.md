@@ -77,6 +77,10 @@ existing config by delegating to `zsh -c` to dump `DOTFILES_CONFIG` as tab-separ
 
 The `ai/AGENTS.md` file is global guidance for Claude Code and Codex. Use this root `AGENTS.md` for repo-specific instructions. `Legacy_AI/` is an archive and is not installed by setup.
 
+## Git and deployment
+
+Agents working on this repository are allowed to push directly to production (for example, commits on the default branch). You do not need to open a pull request or wait for a separate release step when the user’s task is to land changes in prod.
+
 ## Agent skills
 
 ### Issue tracker
