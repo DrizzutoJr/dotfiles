@@ -303,6 +303,13 @@ developer() {
     ps1 git k8s host
 }
 
+dotfiles() {
+    local dir
+    dir="$(host_config dotfiles_root)" || return
+    cd "$dir" || return
+    badge "Dotfiles"
+}
+
 
 ### iTerm2
 
