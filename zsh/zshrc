@@ -303,11 +303,25 @@ developer() {
     ps1 git k8s host
 }
 
+homelab() {
+    local dir
+    dir="$(host_config developer_root)" || return
+    dir="$dir/Projects/Homelab"
+    if [[ ! -d "$dir" ]]; then
+        echo "!!! Homelab Dir $dir not found !!!"
+        return 1
+    fi
+    cd "$dir" || return
+    badge "Homelab"
+    ps1 git k8s host
+}
+
 dotfiles() {
     local dir
     dir="$(host_config dotfiles_root)" || return
     cd "$dir" || return
     badge "Dotfiles"
+    ps1 git k8s host
 }
 
 

@@ -233,12 +233,14 @@ developer() {
 ### HomeLab
 
 homelab() {
-    badge "HomeLab"
+    local dir
+    dir="$(zsh -c 'source "$HOME/.dotfiles-config" && print -r -- "${DOTFILES_CONFIG[developer_root]}"')" || return
+    [[ -n "$dir" ]] || return 1
+    cd "$dir/Projects/Homelab" || return
+    badge "Homelab"
     ps1 git k8s host
     if [[ "$1" == "-" ]]
     then
-        echo "Changing to HomeLab Directory"
-        cd /Users/drizzutojr/Developer/Projects/HomeLab || return
         open -g -a "Visual Studio Code" .
     fi
 }
