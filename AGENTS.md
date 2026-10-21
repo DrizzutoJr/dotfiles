@@ -59,7 +59,7 @@ This is a dotfiles repository that manages configuration files via symlinks from
 ### Per-Machine Values
 
 Values that differ between machines (developer root, brew prefix, username, openbao CA
-cert path, Cursor skill pack) are never derived or looked up in a committed table — a machine only ever needs
+cert path) are never derived or looked up in a committed table — a machine only ever needs
 its own values, and directory names differ enough between machines that no derivation
 scheme would get them right.
 
@@ -79,6 +79,8 @@ existing config by delegating to `zsh -c` to dump `DOTFILES_CONFIG` as tab-separ
 The `ai/AGENTS.md` file is global guidance for Claude Code and Codex. Use this root `AGENTS.md` for repo-specific instructions. `Legacy_AI/` is an archive and is not installed by setup.
 
 ## Agent skills
+
+Use **none** for pstack and mattpocock-skills in this repository unless a task explicitly requires one of those workflows.
 
 ### Issue tracker
 

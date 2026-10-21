@@ -2,6 +2,6 @@
 alwaysApply: true
 ---
 
-- pstack and mattpocock-skills are both installed at user scope unless this machine's dotfiles config set `cursor_skill_pack` to a single pack or `none`. Do not use them together.
-- If the current repository names one, use only that one for the task.
-- If it does not specify which to use, or it is unclear, ask the user to choose **pstack**, **mattpocock-skills**, or **none** before applying either. If they choose none, do not use skills from either pack unless they ask for one later in the same conversation.
+- pstack and mattpocock-skills are installed at user scope on this machine. Do not use them together in one task.
+- Before using either pack, read the current repository's `AGENTS.md`. If it names **pstack**, **mattpocock-skills**, or **none**, follow it for this repository.
+- If the repository does not say, or it is ambiguous, ask the user which skill pack this repository should use (**pstack**, **mattpocock-skills**, or **none**). If they choose none, do not use skills from either pack unless they ask for one later in the same conversation. Offer to add their choice to the repository's `AGENTS.md` when they want it saved for future sessions.
