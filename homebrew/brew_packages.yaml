@@ -18,4 +18,6 @@ casks:
   - claude-code
   - chatgpt
   - codex
+  - grok-bot
+  - cursor
   - alt-tab
