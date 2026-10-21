@@ -301,6 +301,7 @@ developer() {
     echo "Changed to Dir $dir"
     badge "Developer"
     ps1 git k8s host
+    tmux-dir
 }
 
 homelab() {
@@ -314,6 +315,7 @@ homelab() {
     cd "$dir" || return
     badge "Homelab"
     ps1 git k8s host
+    tmux-dir
 }
 
 dotfiles() {
@@ -322,6 +324,7 @@ dotfiles() {
     cd "$dir" || return
     badge "Dotfiles"
     ps1 git k8s host
+    tmux-dir
 }
 
 
