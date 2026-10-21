@@ -12,7 +12,7 @@ CURRENT_HOST="$(scutil --get LocalHostName)"
 # Keys prompted and stored generically. host and dotfiles_root are handled
 # separately: host is auto-detected, dotfiles_root is always the clone this
 # script is running from.
-KEYS=(developer_root brew_prefix username bao_cacert)
+KEYS=(developer_root brew_prefix username bao_cacert cursor_skill_pack)
 
 EXIST_HOST=""
 EXIST_KEYS=()
@@ -79,6 +79,9 @@ compute_default() {
             ;;
         bao_cacert)
             printf '%s' ""
+            ;;
+        cursor_skill_pack)
+            printf '%s' "none"
             ;;
     esac
 }
@@ -152,8 +155,19 @@ confirm_dotfiles_root
 NEW_VALS=()
 for key in "${KEYS[@]}"; do
     default="$(compute_default "$key")"
-    read -r -p "  $key [$default]: " input
-    NEW_VALS+=("${input:-$default}")
+    if [[ "$key" == cursor_skill_pack ]]; then
+        echo "  cursor_skill_pack: which Cursor plugin skills to install (pstack / mattpocock / none)"
+    fi
+    while true; do
+        read -r -p "  $key [$default]: " input
+        val="${input:-$default}"
+        if [[ "$key" != cursor_skill_pack || "$val" == pstack || "$val" == mattpocock || "$val" == none ]]; then
+            NEW_VALS+=("$val")
+            break
+        fi
+        echo "  Choose pstack, mattpocock, or none." >&2
+        default="$val"
+    done
 done
 
 write_config

@@ -89,8 +89,11 @@ for Cursor. Each declaration has a Git commit pin, and plugin files stay in the 
 agent directories. Interactive setup asks whether to use pinned refs or the latest
 versions; `--non-interactive` uses the pins. Codex uses its marketplace ref, Claude Code
 uses a per-user marketplace entry with a pinned Git source, and Cursor loads managed copies
-from `~/.cursor/plugins/local/`. Cursor needs local plugin imports enabled and a window
-reload to discover new plugins. Setup refuses to replace locally changed Cursor plugins and
+from `~/.cursor/plugins/local/` for the pack chosen in `~/.dotfiles-config` as
+`cursor_skill_pack` (`pstack`, `mattpocock`, or `none`; unset keeps both for existing
+machines). Cursor needs local plugin imports enabled and a window reload to discover new
+plugins. Setup also links a global Cursor rule that tells the agent to ask which skill pack
+to use (or none) when a repository does not specify one. Setup refuses to replace locally changed Cursor plugins and
 backs up managed copies before updates. A pinned rerun leaves matching installed plugins
 alone. The latest choice affects that machine only and does not update `ai/plugins.yaml`.
 

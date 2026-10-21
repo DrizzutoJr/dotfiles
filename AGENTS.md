@@ -28,6 +28,7 @@ This is a dotfiles repository that manages configuration files via symlinks from
 | `zsh/zshrc` | `~/.zshrc` |
 | `tmux/tmux.conf` | `~/.tmux.conf` |
 | `ai/AGENTS.md` | `~/.claude/CLAUDE.md` and `~/.codex/AGENTS.md` |
+| `ai/cursor/rules/exclusive-plugin-skills.mdc` | `~/.cursor/rules/exclusive-plugin-skills.mdc` |
 | `sublime/settings.json` | `~/Library/Application Support/Sublime Text/Packages/User/Preferences.sublime-settings` |
 | `sublime/CandyLand.tmTheme` | `~/Library/Application Support/Sublime Text/Packages/User/CandyLand.tmTheme` |
 | `vscode/settings.json` | `~/Library/Application Support/Code/User/settings.json` |
@@ -58,7 +59,7 @@ This is a dotfiles repository that manages configuration files via symlinks from
 ### Per-Machine Values
 
 Values that differ between machines (developer root, brew prefix, username, openbao CA
-cert path) are never derived or looked up in a committed table — a machine only ever needs
+cert path, Cursor skill pack) are never derived or looked up in a committed table — a machine only ever needs
 its own values, and directory names differ enough between machines that no derivation
 scheme would get them right.
 

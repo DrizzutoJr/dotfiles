@@ -12,6 +12,11 @@ fi
 plugin_count="$(yq -r '.plugins | length' "$manifest")"
 plugin_parent="$HOME/.cursor/plugins/local"
 backup_parent="$HOME/.cursor/plugins/dotfiles-backups"
+config_path="$HOME/.dotfiles-config"
+cursor_skill_pack=
+if [[ -f "$config_path" ]]; then
+    cursor_skill_pack="$(CONFIG_PATH="$config_path" zsh -c 'source "$CONFIG_PATH"; print -r -- "${DOTFILES_CONFIG[cursor_skill_pack]:-}"' 2>/dev/null || true)"
+fi
 staging=
 
 cleanup() {
@@ -28,11 +33,42 @@ content_hash() (
     done | shasum -a 256 | cut -d ' ' -f 1
 )
 
+cursor_plugin_name_for_pack() {
+    case "$1" in
+        pstack) printf '%s' pstack ;;
+        mattpocock) printf '%s' mattpocock-skills ;;
+        *) return 1 ;;
+    esac
+}
+
+remove_managed_cursor_plugin() {
+    local remove_name="$1" target="$plugin_parent/$remove_name"
+    [[ -d "$target" && ! -L "$target" && -f "$target/.dotfiles-install" ]] || return 0
+    mkdir -p "$backup_parent"
+    local backup
+    backup="$(mktemp -d "$backup_parent/$remove_name.XXXXXX")"
+    mv "$target" "$backup/removed"
+    echo "..Removed Cursor plugin $remove_name (cursor_skill_pack); backup: $backup/removed"
+}
+
 for ((plugin_index=0; plugin_index<plugin_count; plugin_index++)); do
     agent="$(yq -r ".plugins[$plugin_index].agent" "$manifest")"
     [[ "$agent" == cursor ]] || continue
 
     name="$(yq -r ".plugins[$plugin_index].name" "$manifest")"
+    case "$cursor_skill_pack" in
+        none)
+            echo "..Skipping Cursor plugin $name (cursor_skill_pack=none)"
+            continue
+            ;;
+        pstack|mattpocock)
+            allowed="$(cursor_plugin_name_for_pack "$cursor_skill_pack")" || exit 1
+            if [[ "$name" != "$allowed" ]]; then
+                remove_managed_cursor_plugin "$name"
+                continue
+            fi
+            ;;
+    esac
     source="$(yq -r ".plugins[$plugin_index].source" "$manifest")"
     path="$(yq -r ".plugins[$plugin_index].path" "$manifest")"
     ref="$(yq -r ".plugins[$plugin_index].ref" "$manifest")"

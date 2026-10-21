@@ -11,6 +11,9 @@ instructions="$REPO_DIR/ai/AGENTS.md"
 create_symlink "$instructions" "$HOME/.claude/CLAUDE.md"
 create_symlink "$instructions" "$HOME/.codex/AGENTS.md"
 
+cursor_rule="$REPO_DIR/ai/cursor/rules/exclusive-plugin-skills.mdc"
+create_symlink "$cursor_rule" "$HOME/.cursor/rules/exclusive-plugin-skills.mdc"
+
 for legacy_name in skills commands; do
     legacy_target="$HOME/.claude/$legacy_name"
     if [[ ! -L "$legacy_target" ]]; then
