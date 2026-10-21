@@ -248,8 +248,9 @@ homelab() {
 ### iTerm2
 
 badge() {
-    badgeMessage="$1"
-    echo -ne "\033]1337;SetBadgeFormat=$(echo -n "$badgeMessage" | base64)\a"
+    local badgeMessage="$1"
+    printf '\033]1337;SetBadgeFormat=%s\a' "$(printf '%s' "$badgeMessage" | base64)"
+    printf '\033]1;%s\a' "$badgeMessage"
 }
 
 

@@ -329,7 +329,8 @@ dotfiles() {
 
 badge() {
     local badgeMessage="$1"
-    echo -ne "\033]1337;SetBadgeFormat=$(echo -n "$badgeMessage" | base64)\a"
+    printf '\033]1337;SetBadgeFormat=%s\a' "$(printf '%s' "$badgeMessage" | base64)"
+    printf '\033]1;%s\a' "$badgeMessage"
 }
 
 
