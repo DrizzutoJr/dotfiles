@@ -28,6 +28,31 @@ content_hash() (
     done | shasum -a 256 | cut -d ' ' -f 1
 )
 
+publish_cursor_skills() {
+    local plugin_dir="$1"
+    local skills_root="$plugin_dir/skills"
+    [[ -d "$skills_root" ]] || return 0
+    local dest_root="$HOME/.cursor/skills"
+    mkdir -p "$dest_root"
+    local skill_dir name dest marker
+    for skill_dir in "$skills_root"/*/; do
+        [[ -f "${skill_dir}SKILL.md" ]] || continue
+        name="$(basename "$skill_dir")"
+        dest="$dest_root/$name"
+        marker="$dest/.dotfiles-plugin-skill"
+        if [[ -e "$dest" || -L "$dest" ]]; then
+            if [[ ! -f "$marker" ]]; then
+                echo "! Cursor skill is not managed by dotfiles: $dest" >&2
+                exit 1
+            fi
+            rm -rf "$dest"
+        fi
+        mkdir -p "$dest"
+        cp -R "${skill_dir}." "$dest/"
+        printf '%s\n' "$plugin_dir" > "$marker"
+    done
+}
+
 for ((plugin_index=0; plugin_index<plugin_count; plugin_index++)); do
     agent="$(yq -r ".plugins[$plugin_index].agent" "$manifest")"
     [[ "$agent" == cursor ]] || continue
@@ -54,6 +79,7 @@ for ((plugin_index=0; plugin_index<plugin_count; plugin_index++)); do
         fi
         if [[ "$selection" == pinned && "$installed_ref" == "$ref" ]]; then
             echo "..Cursor plugin already installed: $name"
+            publish_cursor_skills "$target"
             continue
         fi
     fi
@@ -116,5 +142,7 @@ for ((plugin_index=0; plugin_index<plugin_count; plugin_index++)); do
     rm -rf "$staging"
     staging=
     backup=
+    publish_cursor_skills "$target"
     echo "..Installed Cursor plugin: $name ($selection)"
+    echo "..Reload Cursor, then type /poteto-mode or /setup-pstack."
 done

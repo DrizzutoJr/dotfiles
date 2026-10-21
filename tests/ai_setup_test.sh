@@ -45,6 +45,10 @@ if [[ ! -f "$home_dir/.claude/pstack-installed" || ! -f "$fake_installed.pstack"
     echo "Fresh setup did not keep pstack in the user environment" >&2
     exit 1
 fi
+if [[ ! -f "$home_dir/.cursor/skills/poteto-mode/SKILL.md" ]]; then
+    echo "Fresh setup did not publish the poteto-mode skill" >&2
+    exit 1
+fi
 
 codex_instructions="$home_dir/.codex/AGENTS.md"
 claude_instructions="$home_dir/.claude/CLAUDE.md"
@@ -136,9 +140,14 @@ if [[ ! -f "$backed_up_instructions" ]]; then
 fi
 
 backup_count_before="$(find "$migration_home" -type d -name '*.bak.*' | wc -l)"
+rm -rf "$migration_home/.cursor/skills/poteto-mode"
 : > "$fake_log"
 : > "$fake_claude_log"
 run_setup "$migration_home" --non-interactive
+if [[ ! -f "$migration_home/.cursor/skills/poteto-mode/SKILL.md" ]]; then
+    echo "Pinned rerun did not publish the poteto-mode skill" >&2
+    exit 1
+fi
 backup_count_after="$(find "$migration_home" -type d -name '*.bak.*' | wc -l)"
 if [[ "$backup_count_before" != "$backup_count_after" ]]; then
     echo "Rerunning setup created unnecessary backups" >&2
