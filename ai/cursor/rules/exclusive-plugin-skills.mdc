@@ -1,0 +1,7 @@
+---
+alwaysApply: true
+---
+
+- pstack and mattpocock-skills are installed at user scope on this machine. Do not use them together in one task.
+- Before using either pack, read the current repository's `AGENTS.md`. If it names **pstack**, **mattpocock-skills**, or **none**, follow it for this repository.
+- If the repository does not say, or it is ambiguous, ask the user which skill pack this repository should use (**pstack**, **mattpocock-skills**, or **none**). If they choose none, do not use skills from either pack unless they ask for one later in the same conversation. Offer to add their choice to the repository's `AGENTS.md` when they want it saved for future sessions.

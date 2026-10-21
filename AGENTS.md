@@ -28,6 +28,7 @@ This is a dotfiles repository that manages configuration files via symlinks from
 | `zsh/zshrc` | `~/.zshrc` |
 | `tmux/tmux.conf` | `~/.tmux.conf` |
 | `ai/AGENTS.md` | `~/.claude/CLAUDE.md` and `~/.codex/AGENTS.md` |
+| `ai/cursor/rules/exclusive-plugin-skills.mdc` | `~/.cursor/rules/exclusive-plugin-skills.mdc` |
 | `sublime/settings.json` | `~/Library/Application Support/Sublime Text/Packages/User/Preferences.sublime-settings` |
 | `sublime/CandyLand.tmTheme` | `~/Library/Application Support/Sublime Text/Packages/User/CandyLand.tmTheme` |
 | `vscode/settings.json` | `~/Library/Application Support/Code/User/settings.json` |
@@ -82,6 +83,8 @@ The `ai/AGENTS.md` file is global guidance for Claude Code and Codex. Use this r
 Agents working on this repository are allowed to push directly to production (for example, commits on the default branch). You do not need to open a pull request or wait for a separate release step when the user’s task is to land changes in prod.
 
 ## Agent skills
+
+Use **mattpocock-skills** only in this repository; do not use pstack skills here.
 
 ### Issue tracker
 
