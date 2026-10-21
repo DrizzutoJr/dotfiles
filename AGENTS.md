@@ -80,7 +80,7 @@ The `ai/AGENTS.md` file is global guidance for Claude Code and Codex. Use this r
 
 ## Agent skills
 
-Use **none** for pstack and mattpocock-skills in this repository unless a task explicitly requires one of those workflows.
+Use **mattpocock-skills** only in this repository; do not use pstack skills here.
 
 ### Issue tracker
 
