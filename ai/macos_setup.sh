@@ -140,7 +140,7 @@ for ((plugin_index=0; plugin_index<plugin_count; plugin_index++)); do
     source="$(yq -r ".plugins[$plugin_index].source" "$manifest")"
     ref="$(yq -r ".plugins[$plugin_index].ref" "$manifest")"
 
-    if [[ "$agent" == claude ]]; then
+    if [[ "$agent" == claude || "$agent" == cursor ]]; then
         continue
     fi
     if [[ "$agent" != codex || -z "$name" || "$name" == null || -z "$marketplace" || "$marketplace" == null || -z "$source" || "$source" == null || -z "$ref" || "$ref" == null ]]; then
@@ -246,3 +246,4 @@ for ((plugin_index=0; plugin_index<plugin_count; plugin_index++)); do
 done
 
 bash "$REPO_DIR/ai/install_claude_plugins.sh" "$manifest" "$plugin_selection"
+bash "$REPO_DIR/ai/install_cursor_plugins.sh" "$manifest" "$plugin_selection"

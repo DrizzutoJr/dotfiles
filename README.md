@@ -83,15 +83,16 @@ backs up prior user instruction files locally and leaves credentials and session
 app's own directory.
 
 `ai/plugins.yaml` declares third-party plugin installs. It installs `mattpocock-skills`
-for Codex and the community-maintained [pstack port](https://github.com/michael-denyer/pstack-claude)
-for both Codex and Claude Code. The official [pstack](https://github.com/cursor/plugins/tree/main/pstack)
-is for Cursor. Each declaration has a Git commit pin, and plugin files stay in the user's
+for Codex and Cursor, the community-maintained [pstack port](https://github.com/michael-denyer/pstack-claude)
+for Codex and Claude Code, and the official [pstack](https://github.com/cursor/plugins/tree/main/pstack)
+for Cursor. Each declaration has a Git commit pin, and plugin files stay in the user's
 agent directories. Interactive setup asks whether to use pinned refs or the latest
-marketplace versions; `--non-interactive` uses the pins. Codex uses its marketplace ref,
-while Claude Code uses a per-user marketplace entry with a pinned Git source. Setup backs up
-the managed marketplace entry before changing it. A pinned rerun leaves matching installed
-plugins alone. The latest choice affects that machine only and does not update
-`ai/plugins.yaml`.
+versions; `--non-interactive` uses the pins. Codex uses its marketplace ref, Claude Code
+uses a per-user marketplace entry with a pinned Git source, and Cursor loads managed copies
+from `~/.cursor/plugins/local/`. Cursor needs local plugin imports enabled and a window
+reload to discover new plugins. Setup refuses to replace locally changed Cursor plugins and
+backs up managed copies before updates. A pinned rerun leaves matching installed plugins
+alone. The latest choice affects that machine only and does not update `ai/plugins.yaml`.
 
 `ai/skills/drjr-skills/` is the local `drjr-skills` plugin for both agents. Its first
 skill is `explain-code`; add future authored skills under its `skills/` directory so they
